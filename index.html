@@ -3,40 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iuran Sortir | Ar Developer</title>
+    <title>Kas Abadi Sortir | Ar Developer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 10px; margin: 0; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 10px; margin: 0; color: #333; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { text-align: center; color: #2c3e50; margin: 0; text-transform: uppercase; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
         
-        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; margin-bottom: 20px; }
+        .db-card { background: #f8fafc; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #e2e8f0; }
+        .db-card h4 { margin: 0; font-size: 11px; color: #64748b; text-transform: uppercase; }
+        .db-card p { margin: 5px 0 0 0; font-size: 16px; font-weight: bold; }
+        .text-green { color: #27ae60; }
+        .text-red { color: #e74c3c; }
+        .text-blue { color: #3498db; }
+
+        .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; }
         th, td { border: 1px solid #e2e8f0; padding: 10px 5px; text-align: center; }
         th { background: #34495e; color: white; }
+        .nama-col { text-align: left; background: #2c3e50; color: white; position: sticky; left: 0; z-index: 2; min-width: 170px; font-weight: bold; }
         
-        .nama-col { text-align: left; background: #2c3e50; color: white; position: sticky; left: 0; z-index: 2; min-width: 160px; font-weight: bold; padding-left: 10px; }
-        
-        .check-btn { cursor: pointer; font-size: 16px; background: none; border: none; padding: 0; transition: 0.2s; }
-        .check-btn.belum { color: #e74c3c; } 
-        .check-btn.lunas { color: #27ae60; font-weight: bold; }
-        .check-btn:disabled { cursor: default; }
+        .check-btn { cursor: pointer; font-size: 16px; background: none; border: none; padding: 0; }
+        .lunas { color: #27ae60; font-weight: bold; }
+        .belum { color: #e74c3c; }
 
-        .admin-panel { display: none; margin-top: 20px; padding: 15px; background: #f8fafc; border-radius: 10px; border: 1px dashed #3498db; }
-        input { padding: 12px; border: 1px solid #cbd5e0; border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 10px; }
+        .admin-panel { display: none; margin-top: 15px; background: #f1f5f9; padding: 15px; border-radius: 10px; border: 1px dashed #3498db; }
+        input { padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 10px; }
         button { cursor: pointer; border-radius: 8px; font-weight: bold; border: none; transition: 0.3s; }
-        .btn-add { background: #27ae60; color: white; padding: 12px; width: 100%; }
-        .btn-pdf { background: #e67e22; color: white; padding: 15px; width: 100%; margin-top: 15px; }
-        .btn-login { background: #3498db; color: white; padding: 10px; width: 100%; margin-top: 10px; font-size: 11px; }
-        .btn-del { color: #ff7675; cursor: pointer; font-size: 9px; background: #4b5d67; padding: 2px 4px; border-radius: 3px; float: right; }
+        .btn-add { background: #27ae60; color: white; padding: 10px; width: 100%; margin-bottom: 10px; }
+        .btn-pdf { background: #e67e22; color: white; padding: 15px; width: 100%; margin-top: 10px; }
+        .btn-login { background: #3498db; color: white; padding: 8px; width: 100%; margin-top: 10px; font-size: 11px; }
+        
+        .log-list { margin-top: 10px; font-size: 12px; }
+        .log-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
 
-        .footer-brand { text-align: center; margin-top: 30px; font-size: 12px; color: #94a3b8; }
+        .footer-brand { text-align: center; margin-top: 20px; font-size: 12px; color: #94a3b8; }
     </style>
 </head>
 <body>
 
 <div class="container" id="konten-laporan">
-    <h2>Data Iuran Personil Sortir • 2026</h2>
+    <h2>Data Kas Sortir • 2026</h2>
+    
+    <div class="dashboard">
+        <div class="db-card"><h4>Total Pemasukan</h4><p class="text-green" id="txtMasuk">Rp 0</p></div>
+        <div class="db-card"><h4>Total Pengeluaran</h4><p class="text-red" id="txtKeluar">Rp 0</p></div>
+        <div class="db-card"><h4>Saldo Akhir</h4><p class="text-blue" id="txtSaldo">Rp 0</p></div>
+    </div>
+
     <div class="table-responsive">
         <table id="tabelIuran">
             <thead>
@@ -49,15 +64,27 @@
             <tbody></tbody>
         </table>
     </div>
+
+    <div style="margin-top: 25px;">
+        <h4 style="margin-bottom:5px">Riwayat Pengeluaran :</h4>
+        <div class="log-list" id="logPengeluaran"></div>
+    </div>
 </div>
 
 <div class="container" style="background:transparent; box-shadow:none; padding-top:0;">
     <div class="admin-panel" id="formAdmin">
-        <input type="text" id="inputNama" placeholder="Tambah nama personil baru...">
-        <button class="btn-add" onclick="tambahPersonil()">+ TAMBAH PERSONIL</button>
+        <label><b>Input Pengeluaran:</b></label>
+        <input type="text" id="ketKeluar" placeholder="Keterangan pengeluaran...">
+        <input type="number" id="nomKeluar" placeholder="Nominal Rp...">
+        <button class="btn-add" style="background:#34495e" onclick="tambahPengeluaran()">Simpan Pengeluaran</button>
+        <hr>
+        <label><b>Tambah Nama Baru:</b></label>
+        <input type="text" id="inputNama" placeholder="Nama personil...">
+        <button class="btn-add" onclick="tambahPersonil()">+ Daftarkan Personil</button>
     </div>
-    <button class="btn-pdf" onclick="eksporPDF()">📄 DOWNLOAD LAPORAN PDF (LANDSCAPE)</button>
-    <button id="loginBtn" class="btn-login" onclick="toggleAdmin()">🔓 MASUK MODE ADMIN</button>
+    
+    <button class="btn-pdf" onclick="eksporPDF()">📄 CETAK LAPORAN PDF (LANDSCAPE)</button>
+    <button id="loginBtn" class="btn-login" onclick="toggleAdmin()">🔓 MODE ADMIN</button>
     <div class="footer-brand">Build By <strong>Ar Developer • 2026</strong></div>
 </div>
 
@@ -72,34 +99,62 @@
         "AMANDA EKA", "CATUR WAHYU", "KUSTANTI", "TIN TISNOWATI", "DIANIARI WAHYUNI"
     ];
 
-    let dataIuran = JSON.parse(localStorage.getItem('arDev_sortir_2026'));
+    // Load Data
+    let dataIuran = JSON.parse(localStorage.getItem('arDev_sortir_vFinal_2026'));
     
+    // Inisialisasi Data Baru jika kosong
     if (!dataIuran) {
-        dataIuran = personilDefault.map(nama => ({
-            nama: nama,
-            bayar: daftarBulan.reduce((acc, bln) => ({ ...acc, [bln]: false }), {})
-        }));
+        dataIuran = personilDefault.map(nama => {
+            let statusBayar = {};
+            daftarBulan.forEach(bln => {
+                // Set Jan - Apr otomatis TRUE (Lunas)
+                if (["Jan", "Feb", "Mar", "Apr"].includes(bln)) {
+                    statusBayar[bln] = true;
+                } else {
+                    statusBayar[bln] = false;
+                }
+            });
+            return { nama: nama, bayar: statusBayar };
+        });
     }
 
+    let dataKeluar = JSON.parse(localStorage.getItem('arDev_keluar_vFinal_2026')) || [];
     let isAdmin = false;
 
     function updateTampilan() {
         document.getElementById('formAdmin').style.display = isAdmin ? 'block' : 'none';
         document.getElementById('loginBtn').innerText = isAdmin ? "🔒 KELUAR MODE ADMIN" : "🔓 MODE ADMIN";
+        
         const tbody = document.querySelector('#tabelIuran tbody');
         tbody.innerHTML = '';
+        
+        let totalSeluruhCentang = 0;
 
         dataIuran.forEach((p, idx) => {
-            let row = `<tr><td class="nama-col">${idx + 1}. ${p.nama} ${isAdmin ? `<span class="btn-del" onclick="hapusPersonil(${idx})">HAPUS</span>` : ''}</td>`;
+            let row = `<tr><td class="nama-col">${idx + 1}. ${p.nama} ${isAdmin ? `<span style="color:#ff7675; cursor:pointer; font-size:8px; float:right" onclick="hapusPersonil(${idx})">[HAPUS]</span>` : ''}</td>`;
             daftarBulan.forEach(bln => {
+                if(p.bayar[bln]) totalSeluruhCentang++;
                 row += `<td><button class="check-btn ${p.bayar[bln] ? 'lunas' : 'belum'}" onclick="toggleLunas(${idx},'${bln}')" ${!isAdmin ? 'disabled' : ''}>${p.bayar[bln] ? '✔' : '✘'}</button></td>`;
             });
             tbody.innerHTML += row + `</tr>`;
         });
+
+        let totalMasuk = totalSeluruhCentang * 5000;
+        let totalKeluar = dataKeluar.reduce((sum, item) => sum + item.jumlah, 0);
+        
+        document.getElementById('txtMasuk').innerText = "Rp " + totalMasuk.toLocaleString();
+        document.getElementById('txtKeluar').innerText = "Rp " + totalKeluar.toLocaleString();
+        document.getElementById('txtSaldo').innerText = "Rp " + (totalMasuk - totalKeluar).toLocaleString();
+
+        const logDiv = document.getElementById('logPengeluaran');
+        logDiv.innerHTML = dataKeluar.length ? '' : '<span style="color:#999">Belum ada data pengeluaran.</span>';
+        dataKeluar.forEach((k, i) => {
+            logDiv.innerHTML += `<div class="log-item"><span>${k.ket}</span> <b>Rp ${k.jumlah.toLocaleString()}</b> ${isAdmin ? `<span style="color:red; cursor:pointer" onclick="hapusKeluar(${i})"> (x)</span>` : ''}</div>`;
+        });
     }
 
     function toggleAdmin() {
-        if(!isAdmin && prompt("Password:") === "epacantik77") isAdmin = true;
+        if(!isAdmin && prompt("Password Admin:") === "epacantik77") isAdmin = true;
         else isAdmin = false;
         updateTampilan();
     }
@@ -109,21 +164,46 @@
         simpan();
     }
 
+    function tambahPengeluaran() {
+        const ket = document.getElementById('ketKeluar').value;
+        const jml = parseInt(document.getElementById('nomKeluar').value);
+        if(ket && jml) {
+            dataKeluar.push({ ket: ket, jumlah: jml });
+            document.getElementById('ketKeluar').value = '';
+            document.getElementById('nomKeluar').value = '';
+            simpan();
+        }
+    }
+
     function tambahPersonil() {
         const n = document.getElementById('inputNama').value.toUpperCase();
         if(n) {
-            dataIuran.push({ nama: n, bayar: daftarBulan.reduce((acc, bln) => ({ ...acc, [bln]: false }), {}) });
+            // Personil baru otomatis lunas Jan-Apr juga agar adil
+            let sb = {};
+            daftarBulan.forEach(b => sb[b] = ["Jan", "Feb", "Mar", "Apr"].includes(b));
+            dataIuran.push({ nama: n, bayar: sb });
             document.getElementById('inputNama').value = '';
             simpan();
         }
     }
 
-    function hapusPersonil(idx) { if(confirm("Hapus?")) { dataIuran.splice(idx, 1); simpan(); } }
-    function simpan() { localStorage.setItem('arDev_sortir_2026', JSON.stringify(dataIuran)); updateTampilan(); }
-    
+    function hapusPersonil(i) { if(confirm("Hapus data personil ini?")) { dataIuran.splice(i, 1); simpan(); } }
+    function hapusKeluar(i) { if(confirm("Hapus catatan pengeluaran?")) { dataKeluar.splice(i, 1); simpan(); } }
+
+    function simpan() {
+        localStorage.setItem('arDev_sortir_vFinal_2026', JSON.stringify(dataIuran));
+        localStorage.setItem('arDev_keluar_vFinal_2026', JSON.stringify(dataKeluar));
+        updateTampilan();
+    }
+
     function eksporPDF() {
         const el = document.getElementById('konten-laporan');
-        html2pdf().from(el).set({ margin: 0.2, filename: 'Iuran_Sortir_2026.pdf', html2canvas: { scale: 2 }, jsPDF: { orientation: 'landscape' } }).save();
+        html2pdf().from(el).set({ 
+            margin: 0.2, 
+            filename: 'Laporan_Kas_Sortir_2026.pdf', 
+            html2canvas: { scale: 2 }, 
+            jsPDF: { orientation: 'landscape' } 
+        }).save();
     }
 
     updateTampilan();
