@@ -3,148 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabel Iuran Sortir | Ar Developer</title>
+    <title>Iuran Sortir | Ar Developer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; padding: 10px; margin: 0; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 10px; margin: 0; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
         
-        /* Table Style */
-        .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; background: white; font-size: 12px; }
-        th, td { border: 1px solid #dee2e6; padding: 10px; text-align: center; }
-        th { background: #34495e; color: white; min-width: 60px; }
-        th.nama-col { min-width: 120px; background: #2c3e50; sticky: left; }
+        .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+        th, td { border: 1px solid #e2e8f0; padding: 10px 5px; text-align: center; }
+        th { background: #34495e; color: white; }
         
-        /* Status Warna */
-        .check-btn { cursor: pointer; font-size: 18px; color: #ccc; transition: 0.2s; background: none; border: none; }
-        .check-btn.lunas { color: #27ae60; }
+        .nama-col { text-align: left; background: #2c3e50; color: white; position: sticky; left: 0; z-index: 2; min-width: 160px; font-weight: bold; padding-left: 10px; }
         
-        .card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .admin-only { display: none; }
-        input { padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 5px; width: 100%; box-sizing: border-box; }
-        button.primary { background: #27ae60; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
-        
-        .footer-brand { text-align: center; margin-top: 30px; font-size: 11px; color: #94a3b8; }
+        .check-btn { cursor: pointer; font-size: 16px; background: none; border: none; padding: 0; transition: 0.2s; }
+        .check-btn.belum { color: #e74c3c; } 
+        .check-btn.lunas { color: #27ae60; font-weight: bold; }
+        .check-btn:disabled { cursor: default; }
+
+        .admin-panel { display: none; margin-top: 20px; padding: 15px; background: #f8fafc; border-radius: 10px; border: 1px dashed #3498db; }
+        input { padding: 12px; border: 1px solid #cbd5e0; border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 10px; }
+        button { cursor: pointer; border-radius: 8px; font-weight: bold; border: none; transition: 0.3s; }
+        .btn-add { background: #27ae60; color: white; padding: 12px; width: 100%; }
+        .btn-pdf { background: #e67e22; color: white; padding: 15px; width: 100%; margin-top: 15px; }
+        .btn-login { background: #3498db; color: white; padding: 10px; width: 100%; margin-top: 10px; font-size: 11px; }
+        .btn-del { color: #ff7675; cursor: pointer; font-size: 9px; background: #4b5d67; padding: 2px 4px; border-radius: 3px; float: right; }
+
+        .footer-brand { text-align: center; margin-top: 30px; font-size: 12px; color: #94a3b8; }
     </style>
 </head>
 <body>
 
 <div class="container" id="konten-laporan">
-    <h2>Data Iuran Personil Sortir 2026</h2>
-    
+    <h2>Data Iuran Personil Sortir • 2026</h2>
     <div class="table-responsive">
         <table id="tabelIuran">
             <thead>
                 <tr>
-                    <th class="nama-col">Nama Personil</th>
-                    <th>Mei</th>
-                    <th>Jun</th>
-                    <th>Jul</th>
-                    <th>Agu</th>
-                    <th>Sep</th>
-                    <th>Okt</th>
+                    <th class="nama-col">No. Nama Personil</th>
+                    <th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>Mei</th><th>Jun</th>
+                    <th>Jul</th><th>Agu</th><th>Sep</th><th>Okt</th><th>Nov</th><th>Des</th>
                 </tr>
             </thead>
-            <tbody>
-                </tbody>
+            <tbody></tbody>
         </table>
     </div>
 </div>
 
-<div class="container" style="background:transparent; box-shadow:none;">
-    <div class="card admin-only" id="formAdmin">
-        <h4>Panel Admin</h4>
-        <input type="text" id="inputNama" placeholder="Nama personil baru...">
-        <button class="primary" onclick="tambahPersonil()">+ Tambah Personil</button>
+<div class="container" style="background:transparent; box-shadow:none; padding-top:0;">
+    <div class="admin-panel" id="formAdmin">
+        <input type="text" id="inputNama" placeholder="Tambah nama personil baru...">
+        <button class="btn-add" onclick="tambahPersonil()">+ TAMBAH PERSONIL</button>
     </div>
-
-    <button onclick="eksporPDF()" style="background:#e67e22; color:white; border:none; padding:12px; border-radius:5px; width:100%; font-weight:bold; margin-bottom:10px;">📄 Download Laporan PDF</button>
-    <button id="loginBtn" onclick="toggleAdmin()" style="background:#3498db; color:white; border:none; padding:8px; border-radius:5px; width:100%; font-size:11px;">🔓 Mode Admin</button>
-    
-    <div class="footer-brand">
-        Build By <strong>Ar Developer • 2026</strong>
-    </div>
+    <button class="btn-pdf" onclick="eksporPDF()">📄 DOWNLOAD LAPORAN PDF (LANDSCAPE)</button>
+    <button id="loginBtn" class="btn-login" onclick="toggleAdmin()">🔓 MASUK MODE ADMIN</button>
+    <div class="footer-brand">Build By <strong>Ar Developer • 2026</strong></div>
 </div>
 
 <script>
-    let dataIuran = JSON.parse(localStorage.getItem('arDev_iuran_grid')) || [
-        { nama: "Indah", bayar: { Mei: false, Jun: false, Jul: false, Agu: false, Sep: false, Okt: false } }
+    const daftarBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    const personilDefault = [
+        "EVA CANTIK", "INDAH PUTRI SETIANI", "WULAN AGUSTIN", "ERLYNANDEA GEO SISKA", "FATIMATUZ ZACHRO",
+        "ADIN ANGGRAINI", "DEWI AMINAH", "YUNIAR DWI", "RINA WULANDARI", "EILEN SABRINA", "ANGGI DWI PUSPITA",
+        "ASKA NOVITA", "NAISHA ARIDHO", "ANDRIANI SAPUTRI", "ISTI PRASETNYANINGRUM", "KEISHA ANASTASYA",
+        "CANTIKA MITAKHUL", "LIA LESTARI", "APRILIA", "FARIHATUL KAMILA", "ALIFATUZAHRO", "DIANI ARI WAHYUNI",
+        "IDA ANUGRAH", "AMELIA DWI AGUSTINA", "DYAH AYU PERWITA", "SALMA ISNAINI", "DHINKA NOVIATANTI",
+        "AMANDA EKA", "CATUR WAHYU", "KUSTANTI", "TIN TISNOWATI", "DIANIARI WAHYUNI"
     ];
+
+    let dataIuran = JSON.parse(localStorage.getItem('arDev_sortir_2026'));
+    
+    if (!dataIuran) {
+        dataIuran = personilDefault.map(nama => ({
+            nama: nama,
+            bayar: daftarBulan.reduce((acc, bln) => ({ ...acc, [bln]: false }), {})
+        }));
+    }
+
     let isAdmin = false;
-    const daftarBulan = ["Mei", "Jun", "Jul", "Agu", "Sep", "Okt"];
 
     function updateTampilan() {
         document.getElementById('formAdmin').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('loginBtn').innerText = isAdmin ? "🔒 KELUAR MODE ADMIN" : "🔓 MODE ADMIN";
         const tbody = document.querySelector('#tabelIuran tbody');
         tbody.innerHTML = '';
 
-        dataIuran.forEach((personil, idx) => {
-            let baris = `<tr><td style="text-align:left; font-weight:bold;">${personil.nama} 
-                        ${isAdmin ? `<span onclick="hapusPersonil(${idx})" style="color:red; cursor:pointer; float:right;">x</span>` : ''}</td>`;
-            
-            daftarBulan.forEach(bulan => {
-                const isLunas = personil.bayar[bulan];
-                baris += `<td>
-                            <button class="check-btn ${isLunas ? 'lunas' : ''}" 
-                                    onclick="toggleLunas(${idx}, '${bulan}')" 
-                                    ${!isAdmin ? 'disabled' : ''}>
-                                ${isLunas ? '✔' : '✘'}
-                            </button>
-                          </td>`;
+        dataIuran.forEach((p, idx) => {
+            let row = `<tr><td class="nama-col">${idx + 1}. ${p.nama} ${isAdmin ? `<span class="btn-del" onclick="hapusPersonil(${idx})">HAPUS</span>` : ''}</td>`;
+            daftarBulan.forEach(bln => {
+                row += `<td><button class="check-btn ${p.bayar[bln] ? 'lunas' : 'belum'}" onclick="toggleLunas(${idx},'${bln}')" ${!isAdmin ? 'disabled' : ''}>${p.bayar[bln] ? '✔' : '✘'}</button></td>`;
             });
-            baris += '</tr>';
-            tbody.innerHTML += baris;
+            tbody.innerHTML += row + `</tr>`;
         });
     }
 
     function toggleAdmin() {
-        if(!isAdmin) {
-            if(prompt("Password Admin:") === "epacantik77") isAdmin = true;
-        } else { isAdmin = false; }
+        if(!isAdmin && prompt("Password:") === "epacantik77") isAdmin = true;
+        else isAdmin = false;
         updateTampilan();
     }
 
-    function toggleLunas(personilIdx, bulan) {
-        if(!isAdmin) return;
-        dataIuran[personilIdx].bayar[bulan] = !dataIuran[personilIdx].bayar[bulan];
-        simpanData();
+    function toggleLunas(idx, bln) {
+        dataIuran[idx].bayar[bln] = !dataIuran[idx].bayar[bln];
+        simpan();
     }
 
     function tambahPersonil() {
-        const nama = document.getElementById('inputNama').value;
-        if(nama) {
-            let personilBaru = { 
-                nama: nama, 
-                bayar: { Mei: false, Jun: false, Jul: false, Agu: false, Sep: false, Okt: false } 
-            };
-            dataIuran.push(personilBaru);
+        const n = document.getElementById('inputNama').value.toUpperCase();
+        if(n) {
+            dataIuran.push({ nama: n, bayar: daftarBulan.reduce((acc, bln) => ({ ...acc, [bln]: false }), {}) });
             document.getElementById('inputNama').value = '';
-            simpanData();
+            simpan();
         }
     }
 
-    function hapusPersonil(idx) {
-        if(confirm("Hapus personil ini?")) {
-            dataIuran.splice(idx, 1);
-            simpanData();
-        }
-    }
-
-    function simpanData() {
-        localStorage.setItem('arDev_iuran_grid', JSON.stringify(dataIuran));
-        updateTampilan();
-    }
-
+    function hapusPersonil(idx) { if(confirm("Hapus?")) { dataIuran.splice(idx, 1); simpan(); } }
+    function simpan() { localStorage.setItem('arDev_sortir_2026', JSON.stringify(dataIuran)); updateTampilan(); }
+    
     function eksporPDF() {
-        const element = document.getElementById('konten-laporan');
-        html2pdf().from(element).set({
-            margin: 0.3,
-            filename: 'Laporan_Iuran_Sortir.pdf',
-            html2canvas: { scale: 3 },
-            jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } // Landscape supaya muat banyak kolom
-        }).save();
+        const el = document.getElementById('konten-laporan');
+        html2pdf().from(el).set({ margin: 0.2, filename: 'Iuran_Sortir_2026.pdf', html2canvas: { scale: 2 }, jsPDF: { orientation: 'landscape' } }).save();
     }
 
     updateTampilan();
