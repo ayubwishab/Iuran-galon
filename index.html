@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kas Abadi Sortir | Ar Developer</title>
+    <title>Sistem Kas Sortir | Ar Developer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 10px; margin: 0; color: #333; }
@@ -29,13 +29,16 @@
         .belum { color: #e74c3c; }
 
         .admin-panel { display: none; margin-top: 15px; background: #f1f5f9; padding: 15px; border-radius: 10px; border: 1px dashed #3498db; }
+        .form-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #ddd; }
+        label { font-size: 12px; font-weight: bold; display: block; margin-bottom: 5px; color: #34495e; }
         input { padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 10px; }
         button { cursor: pointer; border-radius: 8px; font-weight: bold; border: none; transition: 0.3s; }
-        .btn-add { background: #27ae60; color: white; padding: 10px; width: 100%; margin-bottom: 10px; }
+        .btn-add { background: #27ae60; color: white; padding: 10px; width: 100%; margin-bottom: 5px; }
         .btn-pdf { background: #e67e22; color: white; padding: 15px; width: 100%; margin-top: 10px; }
         .btn-login { background: #3498db; color: white; padding: 8px; width: 100%; margin-top: 10px; font-size: 11px; }
         
-        .log-list { margin-top: 10px; font-size: 12px; }
+        .history-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .log-list { font-size: 12px; }
         .log-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
 
         .footer-brand { text-align: center; margin-top: 20px; font-size: 12px; color: #94a3b8; }
@@ -44,7 +47,7 @@
 <body>
 
 <div class="container" id="konten-laporan">
-    <h2>Data Kas Sortir • 2026</h2>
+    <h2>Data Kas Personil Sortir • 2026</h2>
     
     <div class="dashboard">
         <div class="db-card"><h4>Total Pemasukan</h4><p class="text-green" id="txtMasuk">Rp 0</p></div>
@@ -65,25 +68,42 @@
         </table>
     </div>
 
-    <div style="margin-top: 25px;">
-        <h4 style="margin-bottom:5px">Riwayat Pengeluaran :</h4>
-        <div class="log-list" id="logPengeluaran"></div>
+    <div class="history-grid">
+        <div>
+            <h4 style="color:#27ae60; margin-bottom:10px;">Riwayat Pemasukan (Donasi):</h4>
+            <div class="log-list" id="logMasuk"></div>
+        </div>
+        <div>
+            <h4 style="color:#e74c3c; margin-bottom:10px;">Riwayat Pengeluaran:</h4>
+            <div class="log-list" id="logKeluar"></div>
+        </div>
     </div>
 </div>
 
 <div class="container" style="background:transparent; box-shadow:none; padding-top:0;">
     <div class="admin-panel" id="formAdmin">
-        <label><b>Input Pengeluaran:</b></label>
-        <input type="text" id="ketKeluar" placeholder="Keterangan pengeluaran...">
-        <input type="number" id="nomKeluar" placeholder="Nominal Rp...">
-        <button class="btn-add" style="background:#34495e" onclick="tambahPengeluaran()">Simpan Pengeluaran</button>
-        <hr>
-        <label><b>Tambah Nama Baru:</b></label>
-        <input type="text" id="inputNama" placeholder="Nama personil...">
-        <button class="btn-add" onclick="tambahPersonil()">+ Daftarkan Personil</button>
+        <div class="form-section">
+            <label>INPUT PEMASUKAN LAIN (SUMBANGAN):</label>
+            <input type="text" id="ketMasuk" placeholder="Keterangan (Nama Dermawan...)">
+            <input type="number" id="nomMasuk" placeholder="Nominal Rp...">
+            <button class="btn-add" onclick="tambahMasukLain()">Simpan Pemasukan</button>
+        </div>
+
+        <div class="form-section">
+            <label>INPUT PENGELUARAN:</label>
+            <input type="text" id="ketKeluar" placeholder="Beli apa...">
+            <input type="number" id="nomKeluar" placeholder="Nominal Rp...">
+            <button class="btn-add" style="background:#e74c3c" onclick="tambahPengeluaran()">Simpan Pengeluaran</button>
+        </div>
+
+        <div class="form-section">
+            <label>KELOLA PERSONIL:</label>
+            <input type="text" id="inputNama" placeholder="Nama baru...">
+            <button class="btn-add" style="background:#34495e" onclick="tambahPersonil()">+ Tambah Nama</button>
+        </div>
     </div>
     
-    <button class="btn-pdf" onclick="eksporPDF()">📄 CETAK LAPORAN PDF (LANDSCAPE)</button>
+    <button class="btn-pdf" onclick="eksporPDF()">📄 DOWNLOAD LAPORAN PDF</button>
     <button id="loginBtn" class="btn-login" onclick="toggleAdmin()">🔓 MODE ADMIN</button>
     <div class="footer-brand">Build By <strong>Ar Developer • 2026</strong></div>
 </div>
@@ -99,26 +119,17 @@
         "AMANDA EKA", "CATUR WAHYU", "KUSTANTI", "TIN TISNOWATI", "DIANIARI WAHYUNI"
     ];
 
-    // Load Data
-    let dataIuran = JSON.parse(localStorage.getItem('arDev_sortir_vFinal_2026'));
-    
-    // Inisialisasi Data Baru jika kosong
+    let dataIuran = JSON.parse(localStorage.getItem('arDev_sortir_vUltim'));
     if (!dataIuran) {
-        dataIuran = personilDefault.map(nama => {
-            let statusBayar = {};
-            daftarBulan.forEach(bln => {
-                // Set Jan - Apr otomatis TRUE (Lunas)
-                if (["Jan", "Feb", "Mar", "Apr"].includes(bln)) {
-                    statusBayar[bln] = true;
-                } else {
-                    statusBayar[bln] = false;
-                }
-            });
-            return { nama: nama, bayar: statusBayar };
+        dataIuran = personilDefault.map(n => {
+            let sb = {};
+            daftarBulan.forEach(b => sb[b] = ["Jan", "Feb", "Mar", "Apr"].includes(b));
+            return { nama: n, bayar: sb };
         });
     }
 
-    let dataKeluar = JSON.parse(localStorage.getItem('arDev_keluar_vFinal_2026')) || [];
+    let dataKeluar = JSON.parse(localStorage.getItem('arDev_keluar_vUltim')) || [];
+    let dataMasukLain = JSON.parse(localStorage.getItem('arDev_masukLain_vUltim')) || [];
     let isAdmin = false;
 
     function updateTampilan() {
@@ -127,29 +138,37 @@
         
         const tbody = document.querySelector('#tabelIuran tbody');
         tbody.innerHTML = '';
-        
-        let totalSeluruhCentang = 0;
+        let totalIuran = 0;
 
         dataIuran.forEach((p, idx) => {
             let row = `<tr><td class="nama-col">${idx + 1}. ${p.nama} ${isAdmin ? `<span style="color:#ff7675; cursor:pointer; font-size:8px; float:right" onclick="hapusPersonil(${idx})">[HAPUS]</span>` : ''}</td>`;
             daftarBulan.forEach(bln => {
-                if(p.bayar[bln]) totalSeluruhCentang++;
+                if(p.bayar[bln]) totalIuran += 5000;
                 row += `<td><button class="check-btn ${p.bayar[bln] ? 'lunas' : 'belum'}" onclick="toggleLunas(${idx},'${bln}')" ${!isAdmin ? 'disabled' : ''}>${p.bayar[bln] ? '✔' : '✘'}</button></td>`;
             });
             tbody.innerHTML += row + `</tr>`;
         });
 
-        let totalMasuk = totalSeluruhCentang * 5000;
-        let totalKeluar = dataKeluar.reduce((sum, item) => sum + item.jumlah, 0);
-        
-        document.getElementById('txtMasuk').innerText = "Rp " + totalMasuk.toLocaleString();
-        document.getElementById('txtKeluar').innerText = "Rp " + totalKeluar.toLocaleString();
-        document.getElementById('txtSaldo').innerText = "Rp " + (totalMasuk - totalKeluar).toLocaleString();
+        let totalSumbangan = dataMasukLain.reduce((s, i) => s + i.jumlah, 0);
+        let totalKeluar = dataKeluar.reduce((s, i) => s + i.jumlah, 0);
+        let pemasukanFinal = totalIuran + totalSumbangan;
 
-        const logDiv = document.getElementById('logPengeluaran');
-        logDiv.innerHTML = dataKeluar.length ? '' : '<span style="color:#999">Belum ada data pengeluaran.</span>';
+        document.getElementById('txtMasuk').innerText = "Rp " + pemasukanFinal.toLocaleString();
+        document.getElementById('txtKeluar').innerText = "Rp " + totalKeluar.toLocaleString();
+        document.getElementById('txtSaldo').innerText = "Rp " + (pemasukanFinal - totalKeluar).toLocaleString();
+
+        // Render Log Pemasukan
+        const logIn = document.getElementById('logMasuk');
+        logIn.innerHTML = dataMasukLain.length ? '' : '<span style="color:#999">Tidak ada donasi.</span>';
+        dataMasukLain.forEach((m, i) => {
+            logIn.innerHTML += `<div class="log-item"><span>${m.ket}</span> <b>Rp ${m.jumlah.toLocaleString()}</b> ${isAdmin ? `<span style="color:red; cursor:pointer" onclick="hapusMasuk(${i})">(x)</span>` : ''}</div>`;
+        });
+
+        // Render Log Pengeluaran
+        const logOut = document.getElementById('logKeluar');
+        logOut.innerHTML = dataKeluar.length ? '' : '<span style="color:#999">Tidak ada pengeluaran.</span>';
         dataKeluar.forEach((k, i) => {
-            logDiv.innerHTML += `<div class="log-item"><span>${k.ket}</span> <b>Rp ${k.jumlah.toLocaleString()}</b> ${isAdmin ? `<span style="color:red; cursor:pointer" onclick="hapusKeluar(${i})"> (x)</span>` : ''}</div>`;
+            logOut.innerHTML += `<div class="log-item"><span>${k.ket}</span> <b>Rp ${k.jumlah.toLocaleString()}</b> ${isAdmin ? `<span style="color:red; cursor:pointer" onclick="hapusKeluar(${i})">(x)</span>` : ''}</div>`;
         });
     }
 
@@ -164,11 +183,22 @@
         simpan();
     }
 
+    function tambahMasukLain() {
+        const ket = document.getElementById('ketMasuk').value;
+        const jml = parseInt(document.getElementById('nomMasuk').value);
+        if(ket && jml) {
+            dataMasukLain.push({ ket, jumlah: jml });
+            document.getElementById('ketMasuk').value = '';
+            document.getElementById('nomMasuk').value = '';
+            simpan();
+        }
+    }
+
     function tambahPengeluaran() {
         const ket = document.getElementById('ketKeluar').value;
         const jml = parseInt(document.getElementById('nomKeluar').value);
         if(ket && jml) {
-            dataKeluar.push({ ket: ket, jumlah: jml });
+            dataKeluar.push({ ket, jumlah: jml });
             document.getElementById('ketKeluar').value = '';
             document.getElementById('nomKeluar').value = '';
             simpan();
@@ -178,7 +208,6 @@
     function tambahPersonil() {
         const n = document.getElementById('inputNama').value.toUpperCase();
         if(n) {
-            // Personil baru otomatis lunas Jan-Apr juga agar adil
             let sb = {};
             daftarBulan.forEach(b => sb[b] = ["Jan", "Feb", "Mar", "Apr"].includes(b));
             dataIuran.push({ nama: n, bayar: sb });
@@ -187,12 +216,14 @@
         }
     }
 
-    function hapusPersonil(i) { if(confirm("Hapus data personil ini?")) { dataIuran.splice(i, 1); simpan(); } }
-    function hapusKeluar(i) { if(confirm("Hapus catatan pengeluaran?")) { dataKeluar.splice(i, 1); simpan(); } }
+    function hapusPersonil(i) { if(confirm("Hapus personil?")) { dataIuran.splice(i, 1); simpan(); } }
+    function hapusKeluar(i) { if(confirm("Hapus pengeluaran?")) { dataKeluar.splice(i, 1); simpan(); } }
+    function hapusMasuk(i) { if(confirm("Hapus donasi?")) { dataMasukLain.splice(i, 1); simpan(); } }
 
     function simpan() {
-        localStorage.setItem('arDev_sortir_vFinal_2026', JSON.stringify(dataIuran));
-        localStorage.setItem('arDev_keluar_vFinal_2026', JSON.stringify(dataKeluar));
+        localStorage.setItem('arDev_sortir_vUltim', JSON.stringify(dataIuran));
+        localStorage.setItem('arDev_keluar_vUltim', JSON.stringify(dataKeluar));
+        localStorage.setItem('arDev_masukLain_vUltim', JSON.stringify(dataMasukLain));
         updateTampilan();
     }
 
@@ -200,7 +231,7 @@
         const el = document.getElementById('konten-laporan');
         html2pdf().from(el).set({ 
             margin: 0.2, 
-            filename: 'Laporan_Kas_Sortir_2026.pdf', 
+            filename: 'Laporan_Kas_Sortir_Final.pdf', 
             html2canvas: { scale: 2 }, 
             jsPDF: { orientation: 'landscape' } 
         }).save();
