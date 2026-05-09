@@ -6,226 +6,142 @@
     <title>Kas Galon | Ar Developer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 15px; color: #333; margin: 0; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
-        h2 { text-align: center; color: #2c3e50; margin-top: 0; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
-        
-        .card { border: 1px solid #edf2f7; padding: 15px; border-radius: 10px; margin-bottom: 15px; background: #fff; }
-        .summary { display: flex; justify-content: space-between; font-weight: bold; background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 13px; border: 1px solid #e2e8f0; }
-        .summary span { text-align: center; flex: 1; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-        th, td { border-bottom: 1px solid #f1f5f9; padding: 12px 8px; text-align: left; }
-        th { background: #34495e; color: white; border-radius: 4px; }
-
-        input { padding: 12px; width: 100%; box-sizing: border-box; margin-bottom: 10px; border: 1px solid #cbd5e0; border-radius: 6px; outline: none; }
-        
-        button { cursor: pointer; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 6px; width: 100%; font-weight: bold; transition: 0.3s; margin-bottom: 5px; }
-        button.pdf { background: #e67e22; margin-top: 15px; }
-        button.admin-btn { background: #3498db; margin-top: 10px; font-size: 11px; padding: 8px; }
-        
-        .btn-hapus { width: auto; padding: 4px 8px; background: #e74c3c; font-size: 11px; margin-left: 5px; border-radius: 4px; }
-        .status-lunas { color: #27ae60; font-weight: bold; }
-        .status-belum { color: #e74c3c; font-weight: bold; }
-        
-        /* Class untuk menyembunyikan elemen admin */
+        body { font-family: sans-serif; background: #f0f2f5; padding: 10px; margin: 0; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .card { border: 1px solid #eee; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+        .summary { display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; background: #f8fafc; padding: 10px; border-radius: 5px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+        th, td { border-bottom: 1px solid #eee; padding: 10px; text-align: left; }
+        th { background: #34495e; color: white; }
+        input { padding: 12px; width: 100%; box-sizing: border-box; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 5px; }
+        button { cursor: pointer; padding: 12px; background: #27ae60; color: white; border: none; width: 100%; border-radius: 5px; font-weight: bold; margin-bottom: 5px; }
         .admin-only { display: none; }
-        .footer-brand { text-align: center; margin-top: 25px; font-size: 12px; color: #94a3b8; }
+        .btn-hapus { width: auto; background: #e74c3c; padding: 4px 8px; font-size: 11px; float: right; }
     </style>
 </head>
 <body>
 
 <div class="container" id="konten-laporan">
-    <h2>Laporan Iuran Galon</h2>
+    <h2 id="judulLaporan">Laporan Iuran Galon</h2>
     
     <div class="card">
         <div class="summary">
-            <span>Masuk<br><span id="totalPemasukan" style="color:#27ae60">0</span></span>
-            <span>Keluar<br><span id="totalPengeluaran" style="color:#e74c3c">0</span></span>
-            <span>Saldo<br><span id="saldoAkhir" style="color:#2980b9">0</span></span>
+            <span>Masuk: <span id="totalPemasukan" style="color:#27ae60">0</span></span>
+            <span>Keluar: <span id="totalPengeluaran" style="color:#e74c3c">0</span></span>
+            <span>Saldo: <span id="saldoAkhir" style="color:#2980b9">0</span></span>
         </div>
     </div>
 
     <div class="card">
         <div class="admin-only">
-            <input type="text" id="namaInput" placeholder="Ketik nama anak...">
-            <button onclick="tambahAnggota()">+ Tambah Anggota</button>
+            <input type="text" id="namaInput" placeholder="Tambah nama anak...">
+            <button onclick="tambahAnggota()">+ Tambah Nama</button>
         </div>
         <table id="tabelAnggota">
-            <thead>
-                <tr>
-                    <th>Nama</th>
-                    <th>Status (5rb)</th>
-                </tr>
-            </thead>
+            <thead><tr><th>Nama</th><th>Status (5rb)</th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
 
     <div class="card">
         <div class="admin-only">
-            <input type="text" id="ketKeluar" placeholder="Keterangan pengeluaran...">
+            <input type="text" id="ketKeluar" placeholder="Ket. pengeluaran...">
             <input type="number" id="jumlahKeluar" placeholder="Nominal Rp...">
-            <button onclick="tambahPengeluaran()" style="background: #34495e;">Catat Pengeluaran</button>
+            <button onclick="tambahPengeluaran()" style="background:#34495e">Catat Keluar</button>
         </div>
         <table id="tabelKeluar">
-            <thead>
-                <tr>
-                    <th>Keterangan</th>
-                    <th>Jumlah</th>
-                </tr>
-            </thead>
+            <thead><tr><th>Keterangan</th><th>Jumlah</th></tr></thead>
             <tbody></tbody>
         </table>
     </div>
 </div>
 
-<div class="container" style="background: transparent; box-shadow: none; padding-top: 0;">
-    <button class="pdf" onclick="eksporPDF()">📄 Download Laporan PDF</button>
-    <button id="loginBtn" class="admin-btn" onclick="toggleAdmin()">🔓 Masuk Mode Admin</button>
-    
-    <div class="footer-brand">
-        Build By <strong>Ar Developer • 2026</strong>
-    </div>
+<div class="container" style="background:none; box-shadow:none">
+    <button onclick="eksporPDF()" style="background:#e67e22">📄 Download Laporan PDF</button>
+    <button id="loginBtn" onclick="toggleAdmin()" style="background:#3498db; font-size: 11px;">🔓 Mode Admin</button>
+    <p style="text-align:center; font-size:11px; color:#999; margin-top:20px;">Build By <strong>Ar Developer • 2026</strong></p>
 </div>
 
 <script>
-    let anggota = JSON.parse(localStorage.getItem('dataAnggota')) || [];
-    let pengeluaran = JSON.parse(localStorage.getItem('dataPengeluaran')) || [];
+    let anggota = JSON.parse(localStorage.getItem('galon_anggota')) || [];
+    let pengeluaran = JSON.parse(localStorage.getItem('galon_keluar')) || [];
     let isAdmin = false;
-    const nominalIuran = 5000;
-    const passAdmin = "epacantik77"; // SILAKAN GANTI PASSWORD DI SINI
 
-    updateTampilan();
+    function setBulan() {
+        const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const d = new Date();
+        document.getElementById('judulLaporan').innerText = `Laporan Iuran Galon - ${bulanIndo[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function updateTampilan() {
+        const adminEls = document.querySelectorAll('.admin-only');
+        adminEls.forEach(el => el.style.display = isAdmin ? 'block' : 'none');
+
+        const tbodyA = document.querySelector('#tabelAnggota tbody');
+        tbodyA.innerHTML = '';
+        let masuk = 0;
+        anggota.forEach((item, i) => {
+            if(item.lunas) masuk += 5000;
+            tbodyA.innerHTML += `<tr><td>${item.nama}</td><td>
+                <input type="checkbox" ${item.lunas ? 'checked' : ''} ${isAdmin ? '' : 'disabled'} onchange="toggleBayar(${i})">
+                ${item.lunas ? 'Lunas' : 'Belum'}
+                ${isAdmin ? `<button class="btn-hapus" onclick="hapusAnggota(${i})">x</button>` : ''}
+            </td></tr>`;
+        });
+
+        const tbodyK = document.querySelector('#tabelKeluar tbody');
+        tbodyK.innerHTML = '';
+        let keluar = 0;
+        pengeluaran.forEach((item, i) => {
+            keluar += item.jumlah;
+            tbodyK.innerHTML += `<tr><td>${item.ket}</td><td>Rp ${item.jumlah.toLocaleString()} 
+                ${isAdmin ? `<button class="btn-hapus" onclick="hapusKeluar(${i})">x</button>` : ''}</td></tr>`;
+        });
+
+        document.getElementById('totalPemasukan').innerText = 'Rp ' + masuk.toLocaleString();
+        document.getElementById('totalPengeluaran').innerText = 'Rp ' + keluar.toLocaleString();
+        document.getElementById('saldoAkhir').innerText = 'Rp ' + (masuk - keluar).toLocaleString();
+    }
 
     function toggleAdmin() {
-        if (!isAdmin) {
-            let pass = prompt("Masukkan Password Admin:");
-            if (pass === passAdmin) {
-                isAdmin = true;
-                document.getElementById('loginBtn').innerText = "🔒 Keluar Mode Admin";
-                document.getElementById('loginBtn').style.background = "#95a5a6";
-                alert("Berhasil masuk sebagai Admin");
-            } else {
-                alert("Password Salah!");
-            }
-        } else {
-            isAdmin = false;
-            document.getElementById('loginBtn').innerText = "🔓 Masuk Mode Admin";
-            document.getElementById('loginBtn').style.background = "#3498db";
-        }
+        if(!isAdmin) { if(prompt("Password:") === "1234") isAdmin = true; } 
+        else { isAdmin = false; }
         updateTampilan();
     }
 
     function tambahAnggota() {
-        const nama = document.getElementById('namaInput').value;
-        if(nama) {
-            anggota.push({ nama: nama, lunas: false });
-            document.getElementById('namaInput').value = '';
-            simpanDanUpdate();
-        }
-    }
-
-    function toggleBayar(index) {
-        if(!isAdmin) return;
-        anggota[index].lunas = !anggota[index].lunas;
-        simpanDanUpdate();
+        const n = document.getElementById('namaInput').value;
+        if(n) { anggota.push({nama:n, lunas:false}); document.getElementById('namaInput').value=''; simpan(); }
     }
 
     function tambahPengeluaran() {
-        const ket = document.getElementById('ketKeluar').value;
-        const jumlah = parseInt(document.getElementById('jumlahKeluar').value);
-        if(ket && jumlah) {
-            pengeluaran.push({ ket: ket, jumlah: jumlah });
-            document.getElementById('ketKeluar').value = '';
-            document.getElementById('jumlahKeluar').value = '';
-            simpanDanUpdate();
-        }
+        const k = document.getElementById('ketKeluar').value;
+        const j = parseInt(document.getElementById('jumlahKeluar').value);
+        if(k && j) { pengeluaran.push({ket:k, jumlah:j}); document.getElementById('ketKeluar').value=''; document.getElementById('jumlahKeluar').value=''; simpan(); }
     }
 
-    function simpanDanUpdate() {
-        localStorage.setItem('dataAnggota', JSON.stringify(anggota));
-        localStorage.setItem('dataPengeluaran', JSON.stringify(pengeluaran));
-        updateTampilan();
+    function toggleBayar(i) { anggota[i].lunas = !anggota[i].lunas; simpan(); }
+    function hapusAnggota(i) { if(confirm('Hapus?')) { anggota.splice(i, 1); simpan(); } }
+    function hapusKeluar(i) { if(confirm('Hapus?')) { pengeluaran.splice(i, 1); simpan(); } }
+    function simpan() { 
+        localStorage.setItem('galon_anggota', JSON.stringify(anggota)); 
+        localStorage.setItem('galon_keluar', JSON.stringify(pengeluaran)); 
+        updateTampilan(); 
     }
-
-    function hapusAnggota(index) {
-        if(confirm('Hapus data ini?')) {
-            anggota.splice(index, 1);
-            simpanDanUpdate();
-        }
-    }
-
-    function hapusPengeluaran(index) {
-        if(confirm('Hapus pengeluaran ini?')) {
-            pengeluaran.splice(index, 1);
-            simpanDanUpdate();
-        }
-    }
-
-    function updateTampilan() {
-        // Tampilkan/Sembunyikan Form Input
-        const adminElements = document.querySelectorAll('.admin-only');
-        adminElements.forEach(el => {
-            el.style.display = isAdmin ? 'block' : 'none';
-        });
-
-        const tbodyAnggota = document.querySelector('#tabelAnggota tbody');
-        tbodyAnggota.innerHTML = '';
-        let pemasukan = 0;
-        anggota.forEach((item, index) => {
-            if(item.lunas) pemasukan += nominalIuran;
-            
-            let btnHapus = isAdmin ? `<button class="btn-hapus" onclick="hapusAnggota(${index})">x</button>` : '';
-            let checkbox = `<input type="checkbox" style="width: 18px;" ${item.lunas ? 'checked' : ''} ${isAdmin ? '' : 'disabled'} onchange="toggleBayar(${index})">`;
-
-            tbodyAnggota.innerHTML += `
-                <tr>
-                    <td>${item.nama}</td>
-                    <td>
-                        ${checkbox} 
-                        <span class="${item.lunas ? 'status-lunas' : 'status-belum'}">${item.lunas ? 'Lunas' : 'Belum'}</span>
-                        ${btnHapus}
-                    </td>
-                </tr>`;
-        });
-
-        const tbodyKeluar = document.querySelector('#tabelKeluar tbody');
-        tbodyKeluar.innerHTML = '';
-        let keluar = 0;
-        pengeluaran.forEach((item, index) => {
-            keluar += item.jumlah;
-            let btnHapusKeluar = isAdmin ? `<button class="btn-hapus" onclick="hapusPengeluaran(${index})">x</button>` : '';
-            tbodyKeluar.innerHTML += `
-                <tr>
-                    <td>${item.ket}</td>
-                    <td>Rp ${item.jumlah.toLocaleString()} ${btnHapusKeluar}</td>
-                </tr>`;
-        });
-
-        document.getElementById('totalPemasukan').innerText = 'Rp ' + pemasukan.toLocaleString();
-        document.getElementById('totalPengeluaran').innerText = 'Rp ' + keluar.toLocaleString();
-        document.getElementById('saldoAkhir').innerText = 'Rp ' + (pemasukan - keluar).toLocaleString();
-    }
-
+    
     function eksporPDF() {
         const element = document.getElementById('konten-laporan');
-        const wm = document.createElement("div");
-        wm.innerHTML = "<hr style='border:0;border-top:1px solid #eee;margin-top:20px;'><p style='text-align:right; font-size:10px; color:#94a3b8;'>Build By Ar Developer • 2026</p>";
-        element.appendChild(wm);
-
-        const opsi = {
+        html2pdf().from(element).set({
             margin: 0.5,
-            filename: 'Laporan_Kas_ArDev.pdf',
-            html2canvas: { scale: 3 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-
-        html2pdf().set(opsi).from(element).save().then(() => {
-            element.removeChild(wm);
-        });
+            filename: 'Laporan_Galon_ArDev.pdf',
+            html2canvas: { scale: 3 }
+        }).save();
     }
-</script>
 
+    setBulan();
+    updateTampilan();
+</script>
 </body>
 </html>
+
