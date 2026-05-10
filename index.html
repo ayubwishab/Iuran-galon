@@ -3,258 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kas Sortir | Ar Developer</title>
+    <title>Sistem Laporan Kas | Ar Developer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 10px; margin: 0; color: #333; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h2 { text-align: center; color: #2c3e50; margin: 0; text-transform: uppercase; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 15px; margin: 0; color: #333; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { text-align: center; color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; margin-top: 0; }
         
-        /* Dashboard Saldo */
-        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; margin-bottom: 20px; }
-        .db-card { background: #f8fafc; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #e2e8f0; }
-        .db-card h4 { margin: 0; font-size: 11px; color: #64748b; text-transform: uppercase; }
-        .db-card p { margin: 5px 0 0 0; font-size: 16px; font-weight: bold; }
+        /* Dashboard Keuangan */
+        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .db-card { background: #ffffff; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #e1e8ed; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .db-card h4 { margin: 0; font-size: 11px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; }
+        .db-card p { margin: 8px 0 0 0; font-size: 18px; font-weight: bold; }
         .text-green { color: #27ae60; }
         .text-red { color: #e74c3c; }
         .text-blue { color: #3498db; }
 
-        /* Table Style */
-        .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; }
-        th, td { border: 1px solid #e2e8f0; padding: 10px 5px; text-align: center; }
-        th { background: #34495e; color: white; }
-        .nama-col { text-align: left; background: #2c3e50; color: white; position: sticky; left: 0; z-index: 2; min-width: 170px; font-weight: bold; }
+        /* Tabel Responsive */
+        .table-responsive { overflow-x: auto; border-radius: 10px; border: 1px solid #dee2e6; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; white-space: nowrap; }
+        th, td { border: 1px solid #dee2e6; padding: 12px 8px; text-align: center; }
+        th { background: #34495e; color: white; font-weight: 500; }
+        .nama-col { text-align: left; background: #2c3e50; color: white; position: sticky; left: 0; z-index: 2; font-weight: bold; min-width: 160px; }
         
-        /* Centang & Silang Warna */
-        .check-btn { cursor: pointer; font-size: 16px; background: none; border: none; padding: 0; }
+        /* Simbol Centang/Silang */
+        .check-btn { cursor: pointer; font-size: 18px; background: none; border: none; transition: transform 0.2s; }
         .lunas { color: #27ae60; font-weight: bold; }
         .belum { color: #e74c3c; }
-        
-        /* FIX PDF TERPOTONG: Penting untuk PDF multi-halaman */
-        @media print {
-            .container { box-shadow: none !important; border: none !important; margin: 0 !important; padding: 0 !important; }
-            tr { page-break-inside: avoid !important; }
-            table { page-break-inside: auto; }
-            .no-print { display: none !important; }
-            .history-grid { display: block !important; }
-            .log-item { page-break-inside: avoid; }
-        }
+        .check-btn:active { transform: scale(1.3); }
 
-        /* Admin Panel */
-        .admin-panel { display: none; margin-top: 15px; background: #f1f5f9; padding: 15px; border-radius: 10px; border: 1px dashed #3498db; }
-        .form-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #ddd; }
-        label { font-size: 12px; font-weight: bold; display: block; margin-bottom: 5px; color: #34495e; }
-        input { padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 10px; }
-        button { cursor: pointer; border-radius: 8px; font-weight: bold; border: none; transition: 0.3s; }
-        .btn-add { background: #27ae60; color: white; padding: 10px; width: 100%; margin-bottom: 5px; }
-        .btn-pdf { background: #e67e22; color: white; padding: 15px; width: 100%; margin-top: 10px; font-size: 14px; }
-        .btn-login { background: #3498db; color: white; padding: 8px; width: 100%; margin-top: 10px; font-size: 11px; }
-        
-        .history-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
-        .log-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 12px; }
+        /* Area Narasi Laporan */
+        #laporanTeksArea { background: #ffffff; border: 2px solid #3498db; padding: 20px; border-radius: 10px; margin-top: 30px; }
+        #laporanTeks { font-family: 'Courier New', Courier, monospace; white-space: pre-wrap; font-size: 13px; line-height: 1.6; color: #2c3e50; background: #f9f9f9; padding: 15px; border-radius: 5px; }
 
-        .footer-brand { text-align: center; margin-top: 20px; font-size: 12px; color: #94a3b8; }
+        /* Admin Controls */
+        .admin-panel { display: none; margin-top: 20px; background: #ebf2f7; padding: 20px; border-radius: 12px; border: 1px dashed #3498db; }
+        .admin-panel label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 13px; }
+        input { padding: 12px; border: 1px solid #ccd6dd; border-radius: 8px; width: 100%; box-sizing: border-box; margin-bottom: 12px; font-size: 14px; }
+        button { cursor: pointer; border-radius: 8px; font-weight: bold; border: none; padding: 14px; width: 100%; transition: all 0.3s; margin-top: 5px; }
+        .btn-add { background: #27ae60; color: white; }
+        .btn-add:hover { background: #219150; }
+        .btn-pdf { background: #e67e22; color: white; margin-top: 20px; box-shadow: 0 4px 6px rgba(230, 126, 34, 0.2); }
+        .btn-login { background: #3498db; color: white; font-size: 12px; margin-top: 15px; opacity: 0.9; }
+        
+        .footer-text { text-align: center; margin-top: 25px; font-size: 12px; color: #95a5a6; font-weight: 500; }
     </style>
 </head>
 <body>
 
-<div id="capture-area">
-    <div class="container" id="konten-laporan">
-        <h2>Data Kas Personil Sortir • 2026</h2>
-        
-        <div class="dashboard">
-            <div class="db-card"><h4>Total Pemasukan</h4><p class="text-green" id="txtMasuk">Rp 0</p></div>
-            <div class="db-card"><h4>Total Pengeluaran</h4><p class="text-red" id="txtKeluar">Rp 0</p></div>
-            <div class="db-card"><h4>Saldo Akhir</h4><p class="text-blue" id="txtSaldo">Rp 0</p></div>
-        </div>
+<div class="container">
+    <h2>Kas Sortir • <span id="labelBulanTahun">...</span></h2>
+    
+    <div class="dashboard">
+        <div class="db-card"><h4>Uang Masuk (<span class="bln-label"></span>)</h4><p class="text-green" id="txtMasuk">Rp 0</p></div>
+        <div class="db-card"><h4>Uang Keluar (<span class="bln-label"></span>)</h4><p class="text-red" id="txtKeluar">Rp 0</p></div>
+        <div class="db-card"><h4>Saldo Akhir</h4><p class="text-blue" id="txtSaldo">Rp 0</p></div>
+    </div>
 
-        <div class="table-responsive">
-            <table id="tabelIuran">
-                <thead>
-                    <tr>
-                        <th class="nama-col">No. Nama Personil</th>
-                        <th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>Mei</th><th>Jun</th>
-                        <th>Jul</th><th>Agu</th><th>Sep</th><th>Okt</th><th>Nov</th><th>Des</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+    <div class="table-responsive">
+        <table id="tabelIuran">
+            <thead>
+                <tr>
+                    <th class="nama-col">Nama Personil</th>
+                    <th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>Mei</th><th>Jun</th>
+                    <th>Jul</th><th>Agu</th><th>Sep</th><th>Okt</th><th>Nov</th><th>Des</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 
-        <div class="history-grid">
-            <div>
-                <h4 style="color:#27ae60; margin-bottom:10px;">Pemasukan Lain (Donasi):</h4>
-                <div id="logMasuk"></div>
-            </div>
-            <div>
-                <h4 style="color:#e74c3c; margin-bottom:10px;">Riwayat Pengeluaran:</h4>
-                <div id="logKeluar"></div>
-            </div>
-        </div>
-        <div id="pdf-footer" style="display:none; text-align:right; font-size:10px; color:#94a3b8; margin-top:20px;">
-            Build By Ar Developer • 2026
-        </div>
+    <!-- AREA NARASI UNTUK PDF/WA -->
+    <div id="laporanTeksArea">
+        <h4 style="margin: 0 0 15px 0; color: #3498db; display: flex; align-items: center;">
+            📄 Narasi Laporan Bulan <span class="bln-label" style="margin-left: 5px;"></span>
+        </h4>
+        <div id="laporanTeks">Mengumpulkan data...</div>
     </div>
 </div>
 
-<div class="container no-print" style="background:transparent; box-shadow:none; padding-top:0;">
+<div class="container" style="background:transparent; box-shadow:none; padding-top:0;">
     <div class="admin-panel" id="formAdmin">
-        <div class="form-section">
-            <label>INPUT PEMASUKAN LAIN (DONASI):</label>
-            <input type="text" id="ketMasuk" placeholder="Keterangan / Nama Penyumbang...">
-            <input type="number" id="nomMasuk" placeholder="Nominal Rp...">
-            <button class="btn-add" onclick="tambahMasukLain()">Simpan Pemasukan</button>
-        </div>
-        <div class="form-section">
-            <label>INPUT PENGELUARAN:</label>
-            <input type="text" id="ketKeluar" placeholder="Keterangan pengeluaran...">
-            <input type="number" id="nomKeluar" placeholder="Nominal Rp...">
-            <button class="btn-add" style="background:#e74c3c" onclick="tambahPengeluaran()">Simpan Pengeluaran</button>
-        </div>
-        <div class="form-section">
-            <label>KELOLA PERSONIL:</label>
-            <input type="text" id="inputNama" placeholder="Nama personil baru...">
-            <button class="btn-add" style="background:#34495e" onclick="tambahPersonil()">+ Tambah Nama</button>
-        </div>
+        <label>INPUT PENGELUARAN BULAN INI:</label>
+        <input type="text" id="ketKeluar" placeholder="Contoh: Beli Galon & Gelas">
+        <input type="number" id="nomKeluar" placeholder="Nominal Rp...">
+        <button class="btn-add" style="background:#34495e" onclick="tambahPengeluaran()">SIMPAN PENGELUARAN</button>
     </div>
-    <button class="btn-pdf" onclick="eksporPDF()">📄 DOWNLOAD LAPORAN PDF FULL (32 NAMA)</button>
+    
+    <button class="btn-pdf" onclick="eksporPDF()">📄 DOWNLOAD LAPORAN NARASI (PDF)</button>
     <button id="loginBtn" class="btn-login" onclick="toggleAdmin()">🔓 MODE ADMIN</button>
-    <div class="footer-brand">Build By <strong>Ar Developer • 2026</strong></div>
+    <div class="footer-text">Made by Rahman Erka • 2026</div>
 </div>
 
 <script>
     const daftarBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-    const personilDefault = [
-        "EVA CANTIK", "INDAH PUTRI SETIANI", "WULAN AGUSTIN", "ERLYNANDEA GEO SISKA", "FATIMATUZ ZACHRO",
-        "ADIN ANGGRAINI", "DEWI AMINAH", "YUNIAR DWI", "RINA WULANDARI", "EILEN SABRINA", "ANGGI DWI PUSPITA",
-        "ASKA NOVITA", "NAISHA ARIDHO", "ANDRIANI SAPUTRI", "ISTI PRASETNYANINGRUM", "KEISHA ANASTASYA",
-        "CANTIKA MITAKHUL", "LIA LESTARI", "APRILIA", "FARIHATUL KAMILA", "ALIFATUZAHRO", "DIANI ARI WAHYUNI",
-        "IDA ANUGRAH", "AMELIA DWI AGUSTINA", "DYAH AYU PERWITA", "SALMA ISNAINI", "DHINKA NOVIATANTI",
-        "AMANDA EKA", "CATUR WAHYU", "KUSTANTI", "TIN TISNOWATI", "DIANIARI WAHYUNI"
-    ];
+    const namaBulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    
+    const d = new Date();
+    const bulanIndex = d.getMonth();
+    const bulanSekarang = daftarBulan[bulanIndex];
+    const namaBulanSekarang = namaBulanIndo[bulanIndex];
+    const tahunSekarang = d.getFullYear();
 
-    let dataIuran = JSON.parse(localStorage.getItem('arDev_kas_vFinal_2026'));
-    if (!dataIuran) {
-        dataIuran = personilDefault.map(n => {
-            let sb = {};
-            daftarBulan.forEach(b => sb[b] = ["Jan", "Feb", "Mar", "Apr"].includes(b));
-            return { nama: n, bayar: sb };
-        });
-    }
-
-    let dataKeluar = JSON.parse(localStorage.getItem('arDev_keluar_2026')) || [];
-    let dataMasukLain = JSON.parse(localStorage.getItem('arDev_masukLain_2026')) || [];
+    let dataIuran = JSON.parse(localStorage.getItem('arDev_sortir_v5')) || [];
+    let dataKeluar = JSON.parse(localStorage.getItem('arDev_keluar_v5')) || [];
     let isAdmin = false;
 
     function updateTampilan() {
+        document.getElementById('labelBulanTahun').innerText = `${namaBulanSekarang} ${tahunSekarang}`;
+        document.querySelectorAll('.bln-label').forEach(el => el.innerText = namaBulanSekarang);
         document.getElementById('formAdmin').style.display = isAdmin ? 'block' : 'none';
-        document.getElementById('loginBtn').innerText = isAdmin ? "🔒 KELUAR MODE ADMIN" : "🔓 MODE ADMIN";
+        
         const tbody = document.querySelector('#tabelIuran tbody');
         tbody.innerHTML = '';
-        let totalIuran = 0;
+        
+        let listLunas = [];
+        let listBelum = [];
+        let totalUangMasuk = 0;
 
         dataIuran.forEach((p, idx) => {
-            let row = `<tr><td class="nama-col">${idx + 1}. ${p.nama} ${isAdmin ? `<span style="color:#ff7675; cursor:pointer; font-size:8px; float:right" onclick="hapusPersonil(${idx})">[HAPUS]</span>` : ''}</td>`;
+            let row = `<tr><td class="nama-col">${p.nama}</td>`;
             daftarBulan.forEach(bln => {
-                if(p.bayar[bln]) totalIuran += 5000;
-                row += `<td><button class="check-btn ${p.bayar[bln] ? 'lunas' : 'belum'}" onclick="toggleLunas(${idx},'${bln}')" ${!isAdmin ? 'disabled' : ''}>${p.bayar[bln] ? '✔' : '✘'}</button></td>`;
+                const status = p.bayar[bln];
+                // Hitung hanya untuk bulan berjalan
+                if (bln === bulanSekarang) {
+                    if (status) {
+                        listLunas.push(p.nama);
+                        totalUangMasuk += 5000;
+                    } else {
+                        listBelum.push(p.nama);
+                    }
+                }
+                row += `<td><button class="check-btn ${status ? 'lunas' : 'belum'}" onclick="toggleLunas(${idx},'${bln}')" ${!isAdmin ? 'disabled' : ''}>${status ? '✔' : '✘'}</button></td>`;
             });
             tbody.innerHTML += row + `</tr>`;
         });
 
-        let totalSumbangan = dataMasukLain.reduce((s, i) => s + i.jumlah, 0);
-        let totalKeluar = dataKeluar.reduce((s, i) => s + i.jumlah, 0);
-        let pemasukanFinal = totalIuran + totalSumbangan;
+        // Filter pengeluaran spesifik bulan ini
+        const rincianKeluar = dataKeluar.filter(k => k.bulan === bulanSekarang);
+        const totalUangKeluar = rincianKeluar.reduce((a, b) => a + b.jumlah, 0);
+        const saldoAkhir = totalUangMasuk - totalUangKeluar;
 
-        document.getElementById('txtMasuk').innerText = "Rp " + pemasukanFinal.toLocaleString();
-        document.getElementById('txtKeluar').innerText = "Rp " + totalKeluar.toLocaleString();
-        document.getElementById('txtSaldo').innerText = "Rp " + (pemasukanFinal - totalKeluar).toLocaleString();
+        document.getElementById('txtMasuk').innerText = `Rp ${totalUangMasuk.toLocaleString()}`;
+        document.getElementById('txtKeluar').innerText = `Rp ${totalUangKeluar.toLocaleString()}`;
+        document.getElementById('txtSaldo').innerText = `Rp ${saldoAkhir.toLocaleString()}`;
 
-        renderLog('logMasuk', dataMasukLain, 'hapusMasuk');
-        renderLog('logKeluar', dataKeluar, 'hapusKeluar');
-    }
+        // GENERATE NARASI LAPORAN
+        let narasi = `LAPORAN KAS PERSONIL SORTIR\n`;
+        narasi += `Periode: ${namaBulanSekarang.toUpperCase()} ${tahunSekarang}\n`;
+        narasi += `------------------------------------------\n\n`;
+        
+        if (listBelum.length === 0) {
+            narasi += `✅ STATUS PEMBAYARAN:\nSemua personil telah membayar iuran galon.\n\n`;
+        } else {
+            narasi += `⚠️ DAFTAR BELUM BAYAR (${listBelum.length} Orang):\n`;
+            listBelum.forEach((nama, i) => narasi += `${i+1}. ${nama}\n`);
+            narasi += `\n`;
+        }
 
-    function renderLog(id, data, funcHapus) {
-        const div = document.getElementById(id);
-        div.innerHTML = data.length ? '' : '<span style="color:#999; font-size:11px">Belum ada data.</span>';
-        data.forEach((m, i) => {
-            div.innerHTML += `<div class="log-item"><span>${m.ket}</span> <b>Rp ${m.jumlah.toLocaleString()}</b> ${isAdmin ? `<span style="color:red; cursor:pointer" onclick="${funcHapus}(${i})"> (x)</span>` : ''}</div>`;
-        });
+        narasi += `💰 RINGKASAN KEUANGAN BULAN INI:\n`;
+        narasi += `- Total Uang Masuk  : Rp ${totalUangMasuk.toLocaleString()}\n`;
+        narasi += `- Total Uang Keluar : Rp ${totalUangKeluar.toLocaleString()}\n`;
+        narasi += `- Saldo Akhir       : Rp ${saldoAkhir.toLocaleString()}\n\n`;
+
+        narasi += `💸 RINCIAN PENGELUARAN ${namaBulanSekarang.toUpperCase()}:\n`;
+        if (rincianKeluar.length === 0) {
+            narasi += `- (Belum ada catatan pengeluaran)\n`;
+        } else {
+            rincianKeluar.forEach(k => {
+                narasi += `- ${k.ket}: Rp ${k.jumlah.toLocaleString()}\n`;
+            });
+        }
+
+        narasi += `\n==========================================\n`;
+        narasi += `Dibuat oleh: Made by Rahman Erka • 2026`;
+
+        document.getElementById('laporanTeks').innerText = narasi;
     }
 
     function toggleAdmin() {
-        if(!isAdmin && prompt("Password Admin:") === "epacantik77") isAdmin = true;
+        if(!isAdmin && prompt("Masukkan Password Admin:") === "epacantik77") isAdmin = true;
         else isAdmin = false;
         updateTampilan();
     }
 
     function toggleLunas(idx, bln) {
         dataIuran[idx].bayar[bln] = !dataIuran[idx].bayar[bln];
-        simpan();
-    }
-
-    function tambahMasukLain() {
-        const ket = document.getElementById('ketMasuk').value;
-        const jml = parseInt(document.getElementById('nomMasuk').value);
-        if(ket && jml) { dataMasukLain.push({ ket, jumlah: jml }); document.getElementById('ketMasuk').value = ''; document.getElementById('nomMasuk').value = ''; simpan(); }
+        localStorage.setItem('arDev_sortir_v5', JSON.stringify(dataIuran));
+        updateTampilan();
     }
 
     function tambahPengeluaran() {
         const ket = document.getElementById('ketKeluar').value;
         const jml = parseInt(document.getElementById('nomKeluar').value);
-        if(ket && jml) { dataKeluar.push({ ket, jumlah: jml }); document.getElementById('ketKeluar').value = ''; document.getElementById('nomKeluar').value = ''; simpan(); }
-    }
-
-    function tambahPersonil() {
-        const n = document.getElementById('inputNama').value.toUpperCase();
-        if(n) {
-            let sb = {};
-            daftarBulan.forEach(b => sb[b] = ["Jan", "Feb", "Mar", "Apr"].includes(b));
-            dataIuran.push({ nama: n, bayar: sb });
-            document.getElementById('inputNama').value = '';
-            simpan();
+        if (ket && jml) {
+            dataKeluar.push({ bulan: bulanSekarang, ket: ket, jumlah: jml });
+            localStorage.setItem('arDev_keluar_v5', JSON.stringify(dataKeluar));
+            document.getElementById('ketKeluar').value = '';
+            document.getElementById('nomKeluar').value = '';
+            updateTampilan();
         }
     }
 
-    function hapusPersonil(i) { if(confirm("Hapus personil?")) { dataIuran.splice(i, 1); simpan(); } }
-    function hapusKeluar(i) { if(confirm("Hapus pengeluaran?")) { dataKeluar.splice(i, 1); simpan(); } }
-    function hapusMasuk(i) { if(confirm("Hapus donasi?")) { dataMasukLain.splice(i, 1); simpan(); } }
-
-    function simpan() {
-        localStorage.setItem('arDev_kas_vFinal_2026', JSON.stringify(dataIuran));
-        localStorage.setItem('arDev_keluar_2026', JSON.stringify(dataKeluar));
-        localStorage.setItem('arDev_masukLain_2026', JSON.stringify(dataMasukLain));
-        updateTampilan();
+    function eksporPDF() {
+        const element = document.getElementById('laporanTeksArea');
+        const opsi = {
+            margin: 0.5,
+            filename: `Laporan_Sortir_${namaBulanSekarang}_2026.pdf`,
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        html2pdf().set(opsi).from(element).save();
     }
 
-    function eksporPDF() {
-        const el = document.getElementById('capture-area');
-        const foot = document.getElementById('pdf-footer');
-        
-        foot.style.display = 'block';
-
-        const opsi = {
-            margin: [0.3, 0.3, 0.3, 0.3], 
-            filename: 'Laporan_Kas_Sortir_2026.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { 
-                scale: 2, 
-                logging: false, 
-                useCORS: true,
-                letterRendering: true 
-            },
-            jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
-            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-
-        html2pdf().set(opsi).from(el).save().then(() => {
-            foot.style.display = 'none';
-        });
+    // Inisialisasi Data Awal (Jan-Apr Lunas)
+    if (dataIuran.length === 0) {
+        const listNama = ["EVA CANTIK", "INDAH PUTRI SETIANI", "WULAN AGUSTIN", "ERLYNANDEA GEO SISKA", "FATIMATUZ ZACHRO", "ADIN ANGGRAINI", "DEWI AMINAH", "YUNIAR DWI", "RINA WULANDARI", "EILEN SABRINA", "ANGGI DWI PUSPITA", "ASKA NOVITA", "NAISHA ARIDHO", "ANDRIANI SAPUTRI", "ISTI PRASETNYANINGRUM", "KEISHA ANASTASYA", "CANTIKA MITAKHUL", "LIA LESTARI", "APRILIA", "FARIHATUL KAMILA", "ALIFATUZAHRO", "DIANI ARI WAHYUNI", "IDA ANUGRAH", "AMELIA DWI AGUSTINA", "DYAH AYU PERWITA", "SALMA ISNAINI", "DHINKA NOVIATANTI", "AMANDA EKA", "CATUR WAHYU", "KUSTANTI", "TIN TISNOWATI", "DIANIARI WAHYUNI"];
+        dataIuran = listNama.map(nama => ({
+            nama: nama,
+            bayar: daftarBulan.reduce((acc, bln) => ({ ...acc, [bln]: ["Jan", "Feb", "Mar", "Apr"].includes(bln) }), {})
+        }));
+        localStorage.setItem('arDev_sortir_v5', JSON.stringify(dataIuran));
     }
 
     updateTampilan();
 </script>
 </body>
 </html>
-
