@@ -135,14 +135,65 @@
     function showLoading(show) { document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none'; }
 
     function eksporLaporanNarasi() {
-        const area = document.getElementById('laporan-teks-area'), konten = document.getElementById('konten-narasi');
-        let narasi = `<div style="border:2px solid #000; padding:20px;"><h2 style="text-align:center">LAPORAN KAS SORTIR ONLINE</h2><p style="text-align:center">Build By AR Developer • 2026</p><hr>`;
-        narasi += `<p><b>Uang Masuk:</b> ${document.getElementById('txtMasuk').innerText}</p>`;
-        narasi += `<p><b>Uang Keluar:</b> ${document.getElementById('txtKeluar').innerText}</p><ul>`;
-        narasi += dataLogs.filter(l=>l.tipe==='Pengeluaran').map(k => `<li>${k.ket}: Rp ${k.jumlah.toLocaleString()}</li>`).join('') + `</ul>`;
-        narasi += `<p><b>Saldo Akhir:</b> ${document.getElementById('txtSaldo').innerText}</p></div>`;
-        konten.innerHTML = narasi; area.style.display = 'block';
-        html2pdf().from(area).set({ margin: 1, filename: 'Laporan_Kas_Online.pdf', jsPDF: { unit: 'in', format: 'a4' } }).save().then(() => area.style.display = 'none');
+    const area = document.getElementById('laporan-teks-area');
+    const konten = document.getElementById('konten-narasi');
+    const masuk = document.getElementById('txtMasuk').innerText;
+    const keluar = document.getElementById('txtKeluar').innerText;
+    const saldo = document.getElementById('txtSaldo').innerText;
+
+    // Susun Konten HTML
+    let narasi = `
+        <div style="padding: 30px; border: 2px solid #000; font-family: 'Courier New', monospace; background: #fff; color: #000;">
+            <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
+                <h2 style="margin: 0;">LAPORAN KAS SORTIR 2026</h2>
+                <p style="margin: 5px 0; font-size: 12px;">Build By AR Developer • 2026</p>
+            </div>
+
+            <p><b>RINGKASAN KEUANGAN:</b></p>
+            <table style="width: 100%; margin-bottom: 20px;">
+                <tr><td style="width: 150px;">Uang Masuk</td><td>: <b>${masuk}</b></td></tr>
+                <tr><td>Uang Keluar</td><td>: <b>${keluar}</b></td></tr>
+            </table>
+
+            <p><b>RINCIAN PENGELUARAN:</b></p>
+            <ul>
+                ${dataLogs.filter(l => l.tipe === 'Pengeluaran').length > 0 
+                  ? dataLogs.filter(l => l.tipe === 'Pengeluaran').map(k => `<li>${k.ket}: Rp ${k.jumlah.toLocaleString()}</li>`).join('')
+                  : '<li>(Tidak ada pengeluaran)</li>'}
+            </ul>
+
+            <div style="margin-top: 30px; border-top: 1px dashed #000; padding-top: 10px;">
+                <p style="font-size: 18px;"><b>SALDO AKHIR: <span style="color: blue;">${saldo}</span></b></p>
+            </div>
+            
+            <p style="text-align: center; font-size: 10px; margin-top: 50px; color: #666;">
+                Dokumen ini digenerate otomatis oleh Sistem Online AR Developer.
+            </p>
+        </div>
+    `;
+
+    konten.innerHTML = narasi;
+    
+    // Tampilkan elemen sebentar agar library bisa 'membaca' kontennya
+    area.style.display = 'block';
+
+    const opsi = {
+        margin: 0.5,
+        filename: 'Laporan_Kas_AR_Dev.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { 
+            scale: 2, 
+            useCORS: true, 
+            logging: true,
+            letterRendering: true
+        },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    };
+
+    // Jalankan ekspor
+    html2pdf().set(opsi).from(area).save().then(() => {
+        // Sembunyikan kembali setelah selesai
+        area.style.display = 'none';
     }
 
     fetchData();
