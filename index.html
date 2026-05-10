@@ -3,129 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kas Sortir | AR Developer</title>
-    <!-- Library PDF -->
+    <title>Sistem Kas Online | AR Developer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 10px; margin: 0; color: #333; }
         .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
         h2 { text-align: center; color: #2c3e50; margin: 0; text-transform: uppercase; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
-        
-        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; margin-bottom: 20px; }
+        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
         .db-card { background: #f8fafc; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #e2e8f0; }
-        .db-card h4 { margin: 0; font-size: 11px; color: #64748b; text-transform: uppercase; }
+        .db-card h4 { margin: 0; font-size: 11px; color: #64748b; }
         .db-card p { margin: 5px 0 0 0; font-size: 16px; font-weight: bold; }
-        .text-green { color: #27ae60; }
-        .text-red { color: #e74c3c; }
-        .text-blue { color: #3498db; }
-
+        .text-green { color: #27ae60; } .text-red { color: #e74c3c; } .text-blue { color: #3498db; }
         .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; }
         th, td { border: 1px solid #e2e8f0; padding: 10px 5px; text-align: center; }
         th { background: #34495e; color: white; }
-        .nama-col { text-align: left; background: #2c3e50; color: white; position: sticky; left: 0; z-index: 2; min-width: 170px; font-weight: bold; }
-        
-        .check-btn { cursor: pointer; font-size: 16px; background: none; border: none; padding: 0; }
-        .lunas { color: #27ae60; font-weight: bold; }
-        .belum { color: #e74c3c; }
-
-        /* Style Laporan Narasi Teks untuk PDF */
-        #laporan-teks-area { display: none; padding: 40px; background: #fff; font-family: 'Courier New', monospace; line-height: 1.6; }
-        
-        .admin-panel { display: none; margin-top: 15px; background: #f1f5f9; padding: 15px; border-radius: 10px; border: 1px dashed #3498db; }
-        .form-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #ddd; }
-        input { padding: 10px; border: 1px solid #cbd5e0; border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 10px; }
-        button { cursor: pointer; border-radius: 8px; font-weight: bold; border: none; transition: 0.3s; }
-        .btn-add { background: #27ae60; color: white; padding: 10px; width: 100%; margin-bottom: 5px; }
-        .btn-pdf { background: #e67e22; color: white; padding: 15px; width: 100%; margin-top: 10px; font-size: 14px; }
-        .btn-login { background: #3498db; color: white; padding: 8px; width: 100%; margin-top: 10px; font-size: 11px; }
-        
-        .history-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
-        .log-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 12px; }
-
-        @media print {
-            .no-print { display: none !important; }
-        }
+        .nama-col { text-align: left; background: #2c3e50; color: white; position: sticky; left: 0; font-weight: bold; min-width: 170px; }
+        .check-btn { cursor: pointer; font-size: 16px; background: none; border: none; }
+        .lunas { color: #27ae60; } .belum { color: #e74c3c; }
+        .admin-panel { display: none; background: #f1f5f9; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px dashed #3498db; }
+        input { padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { cursor: pointer; border-radius: 8px; font-weight: bold; border: none; padding: 12px; width: 100%; margin-top: 5px; }
+        .btn-pdf { background: #e67e22; color: white; margin-top: 15px; }
+        .btn-login { background: #3498db; color: white; font-size: 11px; margin-top: 10px; }
+        #laporan-teks-area { display: none; padding: 40px; background: #fff; font-family: monospace; }
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 9999; }
     </style>
 </head>
 <body>
 
-<div class="container no-print" id="main-view">
-    <h2>Data Kas Personil Sortir • 2026</h2>
-    
+<div id="loading-overlay"><b>🔄 Memproses Data...</b></div>
+
+<div class="container">
+    <h2>Data Kas Sortir Online • 2026</h2>
     <div class="dashboard">
-        <div class="db-card"><h4>Total Pemasukan</h4><p class="text-green" id="txtMasuk">Rp 0</p></div>
-        <div class="db-card"><h4>Total Pengeluaran</h4><p class="text-red" id="txtKeluar">Rp 0</p></div>
-        <div class="db-card"><h4>Saldo Akhir</h4><p class="text-blue" id="txtSaldo">Rp 0</p></div>
+        <div class="db-card"><h4>Masuk</h4><p class="text-green" id="txtMasuk">Rp 0</p></div>
+        <div class="db-card"><h4>Keluar</h4><p class="text-red" id="txtKeluar">Rp 0</p></div>
+        <div class="db-card"><h4>Saldo</h4><p class="text-blue" id="txtSaldo">Rp 0</p></div>
     </div>
 
     <div class="table-responsive">
-        <table id="tabelIuran">
+        <table>
             <thead>
-                <tr>
-                    <th class="nama-col">No. Nama Personil</th>
-                    <th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>Mei</th><th>Jun</th>
-                    <th>Jul</th><th>Agu</th><th>Sep</th><th>Okt</th><th>Nov</th><th>Des</th>
-                </tr>
+                <tr><th class="nama-col">Nama Personil</th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>Mei</th><th>Jun</th><th>Jul</th><th>Agu</th><th>Sep</th><th>Okt</th><th>Nov</th><th>Des</th></tr>
             </thead>
-            <tbody></tbody>
+            <tbody id="tbodyIuran"></tbody>
         </table>
     </div>
-
-    <div class="history-grid">
-        <div><h4 style="color:#27ae60;">Pemasukan Lain / Donasi:</h4><div id="logMasuk"></div></div>
-        <div><h4 style="color:#e74c3c;">Riwayat Pengeluaran:</h4><div id="logKeluar"></div></div>
-    </div>
 </div>
 
-<!-- ELEMENT TERSEMBUNYI UNTUK PDF NARASI -->
-<div id="laporan-teks-area">
-    <div id="konten-narasi"></div>
-</div>
+<div id="laporan-teks-area"><div id="konten-narasi"></div></div>
 
-<div class="container no-print" style="background:transparent; box-shadow:none; padding-top:0;">
+<div class="container" style="background:transparent; box-shadow:none; padding-top:0;">
     <div class="admin-panel" id="formAdmin">
-        <div class="form-section">
-            <label><b>TAMBAH PEMASUKAN LAIN:</b></label>
-            <input type="text" id="ketMasuk" placeholder="Keterangan Donasi...">
-            <input type="number" id="nomMasuk" placeholder="Nominal Rp...">
-            <button class="btn-add" onclick="tambahMasukLain()">Simpan Donasi</button>
-        </div>
-        <div class="form-section">
-            <label><b>TAMBAH PENGELUARAN:</b></label>
-            <input type="text" id="ketKeluar" placeholder="Keterangan (Beli apa...)">
-            <input type="number" id="nomKeluar" placeholder="Nominal Rp...">
-            <button class="btn-add" style="background:#e74c3c" onclick="tambahPengeluaran()">Simpan Pengeluaran</button>
-        </div>
+        <input type="text" id="ketLog" placeholder="Keterangan (Donasi/Beli...)">
+        <input type="number" id="nomLog" placeholder="Nominal Rp...">
+        <button onclick="addLog('Donasi')" style="background:#27ae60; color:white;">+ Simpan Donasi</button>
+        <button onclick="addLog('Pengeluaran')" style="background:#e74c3c; color:white;">- Simpan Pengeluaran</button>
     </div>
     
-    <button class="btn-pdf" onclick="eksporLaporanNarasi()">📄 DOWNLOAD LAPORAN RINGKAS (PDF NARASI)</button>
+    <button class="btn-pdf" onclick="eksporLaporanNarasi()">📄 DOWNLOAD LAPORAN RINGKAS (PDF)</button>
     <button id="loginBtn" class="btn-login" onclick="toggleAdmin()">🔓 MODE ADMIN</button>
     <div style="text-align:center; font-size:12px; color:#94a3b8; margin-top:20px;">Build By <strong>AR Developer • 2026</strong></div>
 </div>
 
 <script>
+    // GANTI LINK DI BAWAH INI DENGAN URL WEB APP KAMU
+    const webAppUrl = "https://script.google.com/macros/s/AKfycbxxf_BvawPZRk95OYSXg27N9EsDHVZKmZPONqF9Bhr2Fh-cvwjsj4rIF0JfRp7IkZ5Sfw/exec"; 
+    
     const daftarBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
-    const personilDefault = [
-        "EVA CANTIK", "INDAH PUTRI SETIANI", "WULAN AGUSTIN", "ERLYNANDEA GEO SISKA", "FATIMATUZ ZACHRO",
-        "ADIN ANGGRAINI", "DEWI AMINAH", "YUNIAR DWI", "RINA WULANDARI", "EILEN SABRINA", "ANGGI DWI PUSPITA",
-        "ASKA NOVITA", "NAISHA ARIDHO", "ANDRIANI SAPUTRI", "ISTI PRASETNYANINGRUM", "KEISHA ANASTASYA",
-        "CANTIKA MITAKHUL", "LIA LESTARI", "APRILIA", "FARIHATUL KAMILA", "ALIFATUZAHRO", "DIANI ARI WAHYUNI",
-        "IDA ANUGRAH", "AMELIA DWI AGUSTINA", "DYAH AYU PERWITA", "SALMA ISNAINI", "DHINKA NOVIATANTI",
-        "AMANDA EKA", "CATUR WAHYU", "KUSTANTI", "TIN TISNOWATI", "DIANIARI WAHYUNI"
-    ];
+    let dataIuran = [], dataLogs = [], isAdmin = false;
 
-    let dataIuran = JSON.parse(localStorage.getItem('arDev_kas_final_2026')) || personilDefault.map(n => ({
-        nama: n, bayar: daftarBulan.reduce((a, b) => ({...a, [b]: ["Jan", "Feb", "Mar", "Apr"].includes(b)}), {})
-    }));
-    let dataKeluar = JSON.parse(localStorage.getItem('arDev_keluar_final_2026')) || [];
-    let dataMasukLain = JSON.parse(localStorage.getItem('arDev_masukLain_final_2026')) || [];
-    let isAdmin = false;
+    async function fetchData() {
+        showLoading(true);
+        try {
+            const res = await fetch(webAppUrl);
+            const json = await res.json();
+            dataIuran = json.personil;
+            dataLogs = json.logs;
+            render();
+        } catch (e) { alert("Gagal mengambil data. Pastikan URL benar."); }
+        showLoading(false);
+    }
 
-    function updateTampilan() {
-        document.getElementById('formAdmin').style.display = isAdmin ? 'block' : 'none';
-        document.getElementById('loginBtn').innerText = isAdmin ? "🔒 KELUAR MODE ADMIN" : "🔓 MODE ADMIN";
-        const tbody = document.querySelector('#tabelIuran tbody');
+    function render() {
+        const tbody = document.getElementById('tbodyIuran');
         tbody.innerHTML = '';
         let totalIuran = 0;
 
@@ -133,111 +95,57 @@
             let row = `<tr><td class="nama-col">${idx + 1}. ${p.nama}</td>`;
             daftarBulan.forEach(bln => {
                 if(p.bayar[bln]) totalIuran += 5000;
-                row += `<td><button class="check-btn ${p.bayar[bln] ? 'lunas' : 'belum'}" onclick="toggleLunas(${idx},'${bln}')" ${!isAdmin ? 'disabled' : ''}>${p.bayar[bln] ? '✔' : '✘'}</button></td>`;
+                row += `<td><button class="check-btn ${p.bayar[bln]?'lunas':'belum'}" onclick="toggleLunas('${p.nama}','${bln}',${p.bayar[bln]})" ${!isAdmin?'disabled':''}>${p.bayar[bln]?'✔':'✘'}</button></td>`;
             });
             tbody.innerHTML += row + `</tr>`;
         });
 
-        let totalSumbangan = dataMasukLain.reduce((s, i) => s + i.jumlah, 0);
-        let totalKeluar = dataKeluar.reduce((s, i) => s + i.jumlah, 0);
-        let pemasukanFinal = totalIuran + totalSumbangan;
+        const donasi = dataLogs.filter(l => l.tipe === 'Donasi').reduce((a,b) => a + b.jumlah, 0);
+        const keluar = dataLogs.filter(l => l.tipe === 'Pengeluaran').reduce((a,b) => a + b.jumlah, 0);
+        const masuk = totalIuran + donasi;
 
-        document.getElementById('txtMasuk').innerText = "Rp " + pemasukanFinal.toLocaleString();
-        document.getElementById('txtKeluar').innerText = "Rp " + totalKeluar.toLocaleString();
-        document.getElementById('txtSaldo').innerText = "Rp " + (pemasukanFinal - totalKeluar).toLocaleString();
-
-        renderLog('logMasuk', dataMasukLain);
-        renderLog('logKeluar', dataKeluar);
+        document.getElementById('txtMasuk').innerText = "Rp " + masuk.toLocaleString();
+        document.getElementById('txtKeluar').innerText = "Rp " + keluar.toLocaleString();
+        document.getElementById('txtSaldo').innerText = "Rp " + (masuk - keluar).toLocaleString();
+        document.getElementById('formAdmin').style.display = isAdmin ? 'block' : 'none';
     }
 
-    function renderLog(id, data) {
-        const div = document.getElementById(id);
-        div.innerHTML = data.length ? '' : '<span style="color:#999;">Belum ada data.</span>';
-        data.forEach((item) => {
-            div.innerHTML += `<div class="log-item"><span>${item.ket}</span> <b>Rp ${item.jumlah.toLocaleString()}</b></div>`;
-        });
+    async function toggleLunas(nama, bulan, currentStatus) {
+        showLoading(true);
+        await fetch(webAppUrl, { method: 'POST', body: JSON.stringify({ action: 'updateIuran', nama, bulan, status: !currentStatus }) });
+        await fetchData();
+    }
+
+    async function addLog(tipe) {
+        const ket = document.getElementById('ketLog').value, jumlah = parseInt(document.getElementById('nomLog').value);
+        if(ket && jumlah) {
+            showLoading(true);
+            await fetch(webAppUrl, { method: 'POST', body: JSON.stringify({ action: 'addLog', tipe, ket, jumlah }) });
+            document.getElementById('ketLog').value = ''; document.getElementById('nomLog').value = '';
+            await fetchData();
+        }
     }
 
     function toggleAdmin() {
-        if(!isAdmin && prompt("Password:") === "epacantik77") isAdmin = true;
-        else isAdmin = false;
-        updateTampilan();
+        if(!isAdmin && prompt("Password Admin:") === "epacantik77") isAdmin = true; else isAdmin = false;
+        document.getElementById('loginBtn').innerText = isAdmin ? "🔒 KELUAR MODE ADMIN" : "🔓 MODE ADMIN";
+        render();
     }
 
-    function toggleLunas(idx, bln) {
-        dataIuran[idx].bayar[bln] = !dataIuran[idx].bayar[bln];
-        simpan();
-    }
-
-    function tambahMasukLain() {
-        const ket = document.getElementById('ketMasuk').value;
-        const jml = parseInt(document.getElementById('nomMasuk').value);
-        if(ket && jml) { dataMasukLain.push({ ket, jumlah: jml }); document.getElementById('ketMasuk').value=''; document.getElementById('nomMasuk').value=''; simpan(); }
-    }
-
-    function tambahPengeluaran() {
-        const ket = document.getElementById('ketKeluar').value;
-        const jml = parseInt(document.getElementById('nomKeluar').value);
-        if(ket && jml) { dataKeluar.push({ ket, jumlah: jml }); document.getElementById('ketKeluar').value=''; document.getElementById('nomKeluar').value=''; simpan(); }
-    }
-
-    function simpan() {
-        localStorage.setItem('arDev_kas_final_2026', JSON.stringify(dataIuran));
-        localStorage.setItem('arDev_keluar_final_2026', JSON.stringify(dataKeluar));
-        localStorage.setItem('arDev_masukLain_final_2026', JSON.stringify(dataMasukLain));
-        updateTampilan();
-    }
+    function showLoading(show) { document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none'; }
 
     function eksporLaporanNarasi() {
-        const area = document.getElementById('laporan-teks-area');
-        const konten = document.getElementById('konten-narasi');
-        const masuk = document.getElementById('txtMasuk').innerText;
-        const keluar = document.getElementById('txtKeluar').innerText;
-        const saldo = document.getElementById('txtSaldo').innerText;
-
-        let narasi = `<div style="border:2px solid #000; padding:20px;">`;
-        narasi += `<h2 style="text-align:center; margin-bottom:10px;">LAPORAN KAS SORTIR 2026</h2>`;
-        narasi += `<p style="text-align:center; font-size:12px; margin-top:0;">Build By AR Developer • 2026</p><hr style="border:1px solid #000">`;
-        
-        narasi += `<p style="font-size:16px;"><b>RINGKASAN KEUANGAN:</b></p>`;
-        narasi += `<table style="width:100%; font-size:14px; border:none;">`;
-        narasi += `<tr><td style="width:150px">Uang Masuk</td><td>: <b>${masuk}</b></td></tr>`;
-        narasi += `<tr><td>Uang Keluar</td><td>: <b>${keluar}</b></td></tr>`;
-        narasi += `<tr><td>Saldo Akhir</td><td>: <b style="color:blue">${saldo}</b></td></tr>`;
-        narasi += `</table>`;
-
-        narasi += `<br><p style="font-size:16px;"><b>RINCIAN PENGELUARAN:</b></p>`;
-        if (dataKeluar.length === 0) {
-            narasi += `<p><i>(Belum ada catatan pengeluaran)</i></p>`;
-        } else {
-            narasi += `<ul style="font-size:14px;">`;
-            dataKeluar.forEach(k => {
-                narasi += `<li>${k.ket}: Rp ${k.jumlah.toLocaleString()}</li>`;
-            });
-            narasi += `</ul>`;
-        }
-
-        narasi += `<br><hr style="border:0.5px dashed #000">`;
-        narasi += `<p style="text-align:center; font-size:11px; color:#555;">Dokumen ini dihasilkan secara otomatis oleh sistem Kas AR Developer.</p>`;
-        narasi += `</div>`;
-
-        konten.innerHTML = narasi;
-        area.style.display = 'block';
-
-        const opsi = {
-            margin: 1,
-            filename: 'Laporan_Ringkas_Kas_2026.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-        };
-
-        html2pdf().from(area).set(opsi).save().then(() => {
-            area.style.display = 'none';
-        });
+        const area = document.getElementById('laporan-teks-area'), konten = document.getElementById('konten-narasi');
+        let narasi = `<div style="border:2px solid #000; padding:20px;"><h2 style="text-align:center">LAPORAN KAS SORTIR ONLINE</h2><p style="text-align:center">Build By AR Developer • 2026</p><hr>`;
+        narasi += `<p><b>Uang Masuk:</b> ${document.getElementById('txtMasuk').innerText}</p>`;
+        narasi += `<p><b>Uang Keluar:</b> ${document.getElementById('txtKeluar').innerText}</p><ul>`;
+        narasi += dataLogs.filter(l=>l.tipe==='Pengeluaran').map(k => `<li>${k.ket}: Rp ${k.jumlah.toLocaleString()}</li>`).join('') + `</ul>`;
+        narasi += `<p><b>Saldo Akhir:</b> ${document.getElementById('txtSaldo').innerText}</p></div>`;
+        konten.innerHTML = narasi; area.style.display = 'block';
+        html2pdf().from(area).set({ margin: 1, filename: 'Laporan_Kas_Online.pdf', jsPDF: { unit: 'in', format: 'a4' } }).save().then(() => area.style.display = 'none');
     }
 
-    updateTampilan();
+    fetchData();
 </script>
 </body>
 </html>
