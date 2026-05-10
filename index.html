@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Kas Online | AR Developer</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 10px; margin: 0; color: #333; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 10px; margin: 0; color: #333; }
         .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
         h2 { text-align: center; color: #2c3e50; margin: 0; text-transform: uppercase; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
         
@@ -15,7 +14,7 @@
         .db-card h4 { margin: 0; font-size: 11px; color: #64748b; }
         .db-card p { margin: 5px 0 0 0; font-size: 16px; font-weight: bold; }
         .text-green { color: #27ae60; } .text-red { color: #e74c3c; } .text-blue { color: #3498db; }
-        
+
         .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; }
         th, td { border: 1px solid #e2e8f0; padding: 10px 5px; text-align: center; }
@@ -24,32 +23,27 @@
         
         .check-btn { cursor: pointer; font-size: 16px; background: none; border: none; }
         .lunas { color: #27ae60; } .belum { color: #e74c3c; }
-        
+
         .admin-panel { display: none; background: #f1f5f9; padding: 15px; border-radius: 10px; margin-top: 15px; border: 1px dashed #3498db; }
         input { padding: 10px; width: 100%; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
-        button { cursor: pointer; border-radius: 8px; font-weight: bold; border: none; padding: 12px; width: 100%; margin-top: 5px; }
-        .btn-pdf { background: #e67e22; color: white; margin-top: 15px; }
-        .btn-login { background: #3498db; color: white; font-size: 11px; margin-top: 10px; }
-
-        /* Hidden Area untuk PDF Teks */
-        #laporan-teks-area { 
-            position: absolute; left: -9999px; top: 0; /* Taruh di luar layar agar tidak merusak tampilan */
-            width: 800px; background: white; 
-        }
+        button { cursor: pointer; border-radius: 8px; font-weight: bold; border: none; padding: 12px; width: 100%; margin-top: 5px; transition: 0.3s; }
         
-        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        .btn-pdf { background: #e67e22; color: white; margin-top: 15px; font-size: 14px; }
+        .btn-login { background: #3498db; color: white; font-size: 11px; margin-top: 10px; }
+        
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); display: none; justify-content: center; align-items: center; z-index: 9999; font-weight: bold; color: #3498db; }
     </style>
 </head>
 <body>
 
-<div id="loading-overlay"><b>🔄 Memproses ke Google Sheets...</b></div>
+<div id="loading-overlay">🔄 SINKRONISASI GOOGLE SHEETS...</div>
 
 <div class="container">
     <h2>Data Kas Sortir Online • 2026</h2>
     <div class="dashboard">
-        <div class="db-card"><h4>Masuk</h4><p class="text-green" id="txtMasuk">Rp 0</p></div>
-        <div class="db-card"><h4>Keluar</h4><p class="text-red" id="txtKeluar">Rp 0</p></div>
-        <div class="db-card"><h4>Saldo</h4><p class="text-blue" id="txtSaldo">Rp 0</p></div>
+        <div class="db-card"><h4>Uang Masuk</h4><p class="text-green" id="txtMasuk">Rp 0</p></div>
+        <div class="db-card"><h4>Uang Keluar</h4><p class="text-red" id="txtKeluar">Rp 0</p></div>
+        <div class="db-card"><h4>Saldo Akhir</h4><p class="text-blue" id="txtSaldo">Rp 0</p></div>
     </div>
 
     <div class="table-responsive">
@@ -62,25 +56,22 @@
     </div>
 </div>
 
-<div id="laporan-teks-area">
-    <div id="konten-narasi"></div>
-</div>
-
 <div class="container" style="background:transparent; box-shadow:none; padding-top:0;">
     <div class="admin-panel" id="formAdmin">
+        <label><b>MENU ADMIN:</b></label>
         <input type="text" id="ketLog" placeholder="Keterangan (Donasi/Beli...)">
         <input type="number" id="nomLog" placeholder="Nominal Rp...">
-        <button onclick="addLog('Donasi')" style="background:#27ae60; color:white;">+ Simpan Donasi</button>
-        <button onclick="addLog('Pengeluaran')" style="background:#e74c3c; color:white;">- Simpan Pengeluaran</button>
+        <button onclick="addLog('Donasi')" style="background:#27ae60; color:white;">+ SIMPAN DONASI</button>
+        <button onclick="addLog('Pengeluaran')" style="background:#e74c3c; color:white;">- SIMPAN PENGELUARAN</button>
     </div>
     
-    <button class="btn-pdf" onclick="eksporLaporanNarasi()">📄 DOWNLOAD LAPORAN RINGKAS (PDF)</button>
+    <button class="btn-pdf" onclick="eksporLaporanRingkas()">📄 DOWNLOAD LAPORAN RINGKAS (PDF)</button>
     <button id="loginBtn" class="btn-login" onclick="toggleAdmin()">🔓 MODE ADMIN</button>
     <div style="text-align:center; font-size:12px; color:#94a3b8; margin-top:20px;">Build By <strong>AR Developer • 2026</strong></div>
 </div>
 
 <script>
-    // GANTI LINK DI BAWAH INI DENGAN URL WEB APP KAMU
+    // MASUKKAN URL WEB APP GOOGLE SCRIPT KAMU DI SINI
     const webAppUrl = "https://script.google.com/macros/s/AKfycbxxf_BvawPZRk95OYSXg27N9EsDHVZKmZPONqF9Bhr2Fh-cvwjsj4rIF0JfRp7IkZ5Sfw/exec"; 
     
     const daftarBulan = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
@@ -94,7 +85,7 @@
             dataIuran = json.personil;
             dataLogs = json.logs;
             render();
-        } catch (e) { alert("Koneksi gagal. Cek internet kamu."); }
+        } catch (e) { alert("Koneksi gagal! Periksa URL Apps Script."); }
         showLoading(false);
     }
 
@@ -146,55 +137,51 @@
 
     function showLoading(show) { document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none'; }
 
-    function eksporLaporanNarasi() {
-        const area = document.getElementById('laporan-teks-area');
-        const konten = document.getElementById('konten-narasi');
+    // SISTEM NATIVE PRINT (SOLUSI ANTI PUTIH POLOS)
+    function eksporLaporanRingkas() {
         const masuk = document.getElementById('txtMasuk').innerText;
         const keluar = document.getElementById('txtKeluar').innerText;
         const saldo = document.getElementById('txtSaldo').innerText;
+        const rincian = dataLogs.filter(l => l.tipe === 'Pengeluaran');
+        
+        let listHtml = rincian.length > 0 
+            ? rincian.map(k => `<li>${k.ket}: Rp ${k.jumlah.toLocaleString()}</li>`).join('')
+            : '<li>(Belum ada pengeluaran)</li>';
 
-        konten.innerHTML = `
-            <div style="padding: 40px; background-color: #ffffff !important; color: #000000 !important; font-family: 'Courier New', monospace; border: 2px solid #000;">
-                <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 25px;">
-                    <h1 style="margin: 0; font-size: 20px; color: #000 !important;">LAPORAN KAS KEUANGAN SORTIR</h1>
-                    <p style="margin: 5px 0; font-size: 11px; color: #000 !important;">Build By AR Developer • 2026</p>
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Laporan Kas AR Developer</title>
+                <style>
+                    body { font-family: 'Courier New', monospace; padding: 30px; color: #000; background: #fff; }
+                    .border { border: 2px solid #000; padding: 20px; }
+                    .header { text-align: center; border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 10px; }
+                    .footer { margin-top: 40px; text-align: center; font-size: 10px; border-top: 1px dashed #000; padding-top: 10px; }
+                    .blue { color: blue; font-weight: bold; }
+                </style>
+            </head>
+            <body>
+                <div class="border">
+                    <div class="header">
+                        <h2>LAPORAN KAS SORTIR 2026</h2>
+                        <p>Build By AR Developer • 2026</p>
+                    </div>
+                    <p><b>RINGKASAN KEUANGAN:</b></p>
+                    <p>Uang Masuk  : <b>${masuk}</b></p>
+                    <p>Uang Keluar : <b>${keluar}</b></p>
+                    <p><b>RINCIAN PENGELUARAN:</b></p>
+                    <ul>${listHtml}</ul>
+                    <p style="font-size: 18px;"><b>SALDO AKHIR: <span class="blue">${saldo}</span></b></p>
+                    <div class="footer">Data realtime dari Google Sheets. Dibuat oleh AR Developer.</div>
                 </div>
-
-                <p style="font-size: 15px; color: #000 !important;"><b>RINGKASAN KEUANGAN:</b></p>
-                <p style="color: #000 !important;">- TOTAL UANG MASUK : <b>${masuk}</b></p>
-                <p style="color: #000 !important;">- TOTAL UANG KELUAR: <b>${keluar}</b></p>
-                <p style="color: #000 !important;">- SALDO AKHIR      : <b style="color: blue !important;">${saldo}</b></p>
-                
-                <br>
-                <p style="font-size: 15px; color: #000 !important;"><b>RINCIAN PENGELUARAN:</b></p>
-                <ul style="color: #000 !important;">
-                    ${dataLogs.filter(l => l.tipe === 'Pengeluaran').length > 0 
-                      ? dataLogs.filter(l => l.tipe === 'Pengeluaran').map(k => `<li style="margin-bottom: 5px;">${k.ket}: Rp ${k.jumlah.toLocaleString()}</li>`).join('')
-                      : '<li style="list-style: none;">(Belum ada pengeluaran)</li>'}
-                </ul>
-
-                <p style="text-align: center; font-size: 10px; margin-top: 50px; color: #666 !important; border-top: 1px dashed #ccc; padding-top: 10px;">
-                    Dibuat secara otomatis melalui Sistem Kas Online AR Developer.
-                </p>
-            </div>
-        `;
-
-        area.style.display = 'block';
-
-        const opsi = {
-            margin: 0.5,
-            filename: 'Laporan_Kas_AR_Dev.pdf',
-            image: { type: 'jpeg', quality: 1 },
-            html2canvas: { scale: 2, backgroundColor: '#ffffff', useCORS: true },
-            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-        };
-
-        // Tunggu 500ms agar render teks selesai sebelum di-save
-        setTimeout(() => {
-            html2pdf().set(opsi).from(area).save().then(() => {
-                area.style.display = 'none';
-            });
-        }, 500);
+                <script>
+                    window.onload = function() { window.print(); window.close(); };
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
     }
 
     fetchData();
