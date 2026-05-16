@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kas Sortir | Sortir Team</title>
+    <title>Data Kas Online | Sortir Team</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 10px; margin: 0; color: #333; }
         .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px; }
@@ -44,7 +44,7 @@
 <div id="loading-overlay">🔄 SINKRONISASI DATA...</div>
 
 <div class="container">
-    <h2>• Data Kas Sortir Online • </h2>
+    <h2>Data Kas Sortir Online • 2026</h2>
     <div class="dashboard">
         <div class="db-card"><h4>Uang Masuk</h4><p class="text-green" id="txtMasuk">Rp 0</p></div>
         <div class="db-card"><h4>Uang Keluar</h4><p class="text-red" id="txtKeluar">Rp 0</p></div>
@@ -61,7 +61,7 @@
     </div>
 
     <div class="expense-area">
-        <div class="expense-title">💸 Riwayat Pengeluaran & Pemasukan:</div>
+        <div class="expense-title">💸 Riwayat Pengeluaran & Donasi:</div>
         <div id="expenseList"></div>
     </div>
 </div>
@@ -70,12 +70,12 @@
     <div class="admin-panel" id="formAdmin">
         <input type="text" id="ketLog" placeholder="Keterangan (Donasi/Beli...)">
         <input type="number" id="nomLog" placeholder="Nominal Rp...">
-        <button onclick="addLog('Donasi')" style="background:#27ae60; color:white;">+ SIMPAN PEMASUKAN</button>
+        <button onclick="addLog('Donasi')" style="background:#27ae60; color:white;">+ SIMPAN DONASI</button>
         <button onclick="addLog('Pengeluaran')" style="background:#e74c3c; color:white;">- SIMPAN PENGELUARAN</button>
     </div>
     
     <button id="loginBtn" class="btn-login" onclick="toggleAdmin()">🔓 MODE ADMIN</button>
-    <div style="text-align:center; font-size:12px; color:#94a3b8; margin-top:20px;">Build By <strong>Team Sortir ❤️ • 2026 All Right Reserved</strong></div>
+    <div style="text-align:center; font-size:12px; color:#94a3b8; margin-top:20px;">Build By <strong>Sortir Team❤️ • 2026 All Right Reserved</strong></div>
 </div>
 
 <script>
@@ -110,7 +110,7 @@
             tbody.innerHTML += row + `</tr>`;
         });
 
-        const pemasukan = dataLogs.filter(l => l.tipe === 'Pemasukan').reduce((a,b) => a + b.jumlah, 0);
+        const donasi = dataLogs.filter(l => l.tipe === 'Donasi').reduce((a,b) => a + b.jumlah, 0);
         const keluar = dataLogs.filter(l => l.tipe === 'Pengeluaran').reduce((a,b) => a + b.jumlah, 0);
         const masuk = totalIuran + donasi;
 
@@ -157,7 +157,7 @@
     }
 
     function toggleAdmin() {
-        if(!isAdmin && prompt("Password Admin:") === "epacantik77") isAdmin = true; else isAdmin = false;
+        if(!isAdmin && prompt("Password Admin:") === "evacantik77") isAdmin = true; else isAdmin = false;
         document.getElementById('loginBtn').innerText = isAdmin ? "🔒 KELUAR MODE ADMIN" : "🔓 MODE ADMIN";
         render();
     }
